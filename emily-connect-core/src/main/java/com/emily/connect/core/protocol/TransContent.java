@@ -1,8 +1,6 @@
 package com.emily.connect.core.protocol;
 
 
-import com.emily.connect.core.db.DbModelItem;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +23,6 @@ public class TransContent {
     /**
      * sql语句占位符参数
      */
-    public List<DbModelItem> params = new ArrayList<>();
+    public List<String> params = new ArrayList<>();
 
 }

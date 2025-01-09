@@ -7,22 +7,20 @@
         <version>1.0.1</version>
     </parent>
 
-    <artifactId>emily-connect-client</artifactId>
+    <artifactId>sample-connect-client</artifactId>
     <packaging>jar</packaging>
 
-    <name>emily-connect-client</name>
-    <url>https://github.com/mingyang66/emily-connect</url>
+    <name>sample-connect-client</name>
+    <url>http://maven.apache.org</url>
 
     <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>com.emily.connect</groupId>
-            <artifactId>emily-connect-core</artifactId>
+            <artifactId>emily-connect-client</artifactId>
             <version>1.0.1</version>
         </dependency>
     </dependencies>
