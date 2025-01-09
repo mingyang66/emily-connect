@@ -2,7 +2,6 @@ package com.emily.connect.sample.client;
 
 import com.emily.connect.client.ClientConnection;
 import com.emily.connect.client.ClientProperties;
-import com.emily.connect.core.db.DbModelItem;
 import com.emily.connect.core.protocol.TransContent;
 import com.emily.connect.core.protocol.TransHeader;
 import com.emily.connect.core.utils.UUIDUtils;
@@ -28,7 +27,7 @@ public class ConnectClientBootStrap {
                 Object list = selectBody(String.valueOf(i));
 
                 System.out.println(i + "---------false");
-                Thread.sleep(1000 * 60 * 1);
+                Thread.sleep(1000 * 6 * 1);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -41,7 +40,7 @@ public class ConnectClientBootStrap {
             TransContent transContent = new TransContent();
             transContent.dbName = "account";
             transContent.dbTag = "select_test_dual";
-            transContent.params.add(new DbModelItem("testText", i));
+            transContent.params.add("testText");
             Object list = executeQuery(transContent);
             return list;
         } catch (Exception e) {
@@ -49,6 +48,7 @@ public class ConnectClientBootStrap {
         }
         return null;
     }
+
     /**
      * 查询操作
      *
@@ -58,7 +58,7 @@ public class ConnectClientBootStrap {
      */
     public static Object executeQuery(TransContent transContent) throws Exception {
         TransHeader transHeader = new TransHeader(UUIDUtils.randomSimpleUUID());
-        List<Map<String, DbModelItem>> list = connection.sendRequest(transHeader, transContent, new TypeReference<>() {
+        List<Map<String, String>> list = connection.sendRequest(transHeader, transContent, new TypeReference<>() {
         });
         return list;
     }

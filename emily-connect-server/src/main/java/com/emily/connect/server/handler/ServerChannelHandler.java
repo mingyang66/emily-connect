@@ -37,7 +37,7 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
      * 接收客户端传入的值，将值解析为类对象，获取其中的属性，然后反射调用实现类的方法
      */
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+    public void channelRead(ChannelHandlerContext ctx, Object msg) {
         if (msg == null) {
             return;
         }

@@ -18,7 +18,7 @@ import java.io.IOException;
  * @CreateDate :  Created in 2023/2/28 2:59 PM
  */
 public class MessagePackUtils {
-    private static ObjectMapper objectMapper;
+    private static final ObjectMapper objectMapper;
 
     static {
         objectMapper = new MessagePackMapper();
