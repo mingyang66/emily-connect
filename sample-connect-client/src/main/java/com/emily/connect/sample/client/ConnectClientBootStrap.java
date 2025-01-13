@@ -58,7 +58,7 @@ public class ConnectClientBootStrap {
      */
     public static Object executeQuery(TransContent transContent) throws Exception {
         TransHeader transHeader = new TransHeader(UUIDUtils.randomSimpleUUID());
-        List<Map<String, String>> list = connection.sendRequest(transHeader, transContent, new TypeReference<>() {
+        Object list = connection.getForEntity(transHeader, transContent, new TypeReference<>() {
         });
         return list;
     }

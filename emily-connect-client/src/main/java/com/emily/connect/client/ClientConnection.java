@@ -7,7 +7,6 @@ import com.emily.connect.core.protocol.TransContent;
 import com.emily.connect.core.protocol.TransHeader;
 import com.emily.connect.core.utils.MessagePackUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.google.common.collect.Lists;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelOption;
@@ -21,10 +20,9 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.concurrent.Future;
 import org.apache.commons.lang3.math.NumberUtils;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Objects;
 
 /**
  * @program: SkyDb
@@ -38,32 +36,22 @@ public class ClientConnection {
      */
     private static final EventLoopGroup workerGroup = new NioEventLoopGroup();
     /**
-     * 创建客户端的启动对象 bootstrap
-     */
-    private static final Bootstrap bootstrap = new Bootstrap();
-    /**
      * 允许将特定的key映射到ChannelPool，可以获取匹配的ChannelPool,如果不存在则会创建一个新的对象
      * 即：根据不同的服务器地址初始化ChannelPoolMap
      */
-    private static ChannelPoolMap<InetSocketAddress, ChannelPool> poolMap;
-    /**
-     * 计数器
-     */
-    private final AtomicInteger counter = new AtomicInteger();
+    private final ChannelPoolMap<InetSocketAddress, ChannelPool> poolMap;
+
     private final ClientProperties properties;
 
     public ClientConnection(ClientProperties properties) {
         this.properties = properties;
-        build();
-        //初始化ChannelPoolMap
-        properties.getAddress().forEach(address -> {
-            poolMap.get(new InetSocketAddress(address.getIp(), address.getPort()));
-        });
+        this.poolMap = this.newChannelPoolMap(properties);
     }
 
-    private void build() {
-        //设置线程组
-        bootstrap.group(workerGroup)
+    public Bootstrap newBootstrap() {
+        return new Bootstrap()
+                //设置线程组
+                .group(workerGroup)
                 //初始化通道
                 .channel(NioSocketChannel.class)
                 /**
@@ -85,32 +73,25 @@ public class ClientConnection {
                  * If this time is exceeded or the connection cannot be established, the connection fails.
                  */
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, NumberUtils.toInt(String.valueOf(properties.getConnectTimeOut().toMillis())));
+    }
 
+    public AbstractChannelPoolMap<InetSocketAddress, ChannelPool> newChannelPoolMap(ClientProperties properties) {
+        Bootstrap bootstrap = newBootstrap();
         //ChannelPool存储、创建、删除管理Map类
-        poolMap = new AbstractChannelPoolMap<>() {
+        return new AbstractChannelPoolMap<>() {
             //如果ChannelPool不存在，则会创建一个新的对象
             @Override
-            protected ChannelPool newPool(InetSocketAddress key) {
-                return new FixedChannelPool(bootstrap.remoteAddress(key), new SimpleChannelPoolHandler(), properties.getMaxConnections());
+            protected ChannelPool newPool(InetSocketAddress inetSocketAddress) {
+                return new FixedChannelPool(bootstrap.remoteAddress(inetSocketAddress), new SimpleChannelPoolHandler(), properties.getMaxConnections());
             }
         };
     }
 
-
     /**
-     * 通过轮询机制公平获取ChannelPool
-     *
-     * @return ChannelPool
+     * 获取ChannelPool连接池
      */
-    public ChannelPool selectChannelPool() throws IllegalAccessException {
-        AbstractChannelPoolMap temp = ((AbstractChannelPoolMap) poolMap);
-        List<Map.Entry<InetSocketAddress, FixedChannelPool>> list = Lists.newArrayList(temp.iterator());
-        if (list.size() == 0) {
-            throw new IllegalAccessException("ChannelPool中无有效连接");
-        }
-        //数据增加到最大Integer.MAX_VALUE后绝对值开始减小
-        int pos = Math.abs(counter.getAndIncrement());
-        return list.get(pos % list.size()).getValue();
+    public ChannelPool getChannelPool(InetSocketAddress inetSocketAddress) {
+        return poolMap.get(inetSocketAddress);
     }
 
     /**
@@ -119,36 +100,48 @@ public class ClientConnection {
      * @param transHeader  请求头
      * @param transContent 请求体
      * @param reference    返回值数据类型
-     * @param <T>
-     * @return
-     * @throws Exception
      */
-    public <T> T sendRequest(TransHeader transHeader, TransContent transContent, TypeReference<? extends T> reference) throws Exception {
-        T response = null;
+    public <T> T getForEntity(TransHeader transHeader, TransContent transContent, TypeReference<? extends T> reference) throws IOException {
+        //请求唯一标识序列化
+        byte[] headerBytes = MessagePackUtils.serialize(transHeader);
+        //请求体序列化
+        byte[] bodyBytes = MessagePackUtils.serialize(transContent);
+        //TCP发送数据包，并对发送数据序列化
+        DataPacket packet = new DataPacket(headerBytes, bodyBytes);
+        DataPacket pack = getForObject(packet);
+        //根据返回结果做后续处理
+        if (pack == null) {
+            //todo
+            return null;
+        } else {
+            return MessagePackUtils.deSerialize(pack.content, reference);
+        }
+    }
+
+    /**
+     * 发送请求
+     */
+    public DataPacket getForObject(DataPacket packet) {
+        DataPacket response = null;
+        ChannelPool pool = getChannelPool(new InetSocketAddress("127.0.0.1", 9999));
+        Channel channel = null;
+        ClientChannelHandler ioHandler = null;
         try {
-            //获取ChannelPool连接池
-            ChannelPool channelPool = selectChannelPool();
             //从ChannelPool中获取一个Channel
-            final Future<Channel> future = channelPool.acquire();
+            final Future<Channel> future = pool.acquire();
             //等待future完成
             future.await();
             //判定I/O操作是否成功完成
             if (future.isSuccess()) {
                 //无阻塞获取Channel对象
-                final Channel ch = future.getNow();
-                if (ch != null && ch.isActive() && ch.isWritable()) {
+                channel = future.getNow();
+                if (channel != null && channel.isActive() && channel.isWritable()) {
                     //获取信道对应的handler对象
-                    final ClientChannelHandler ioHandler = SimpleChannelPoolHandler.IO_HANDLER_MAP.get(ch.id());
+                    ioHandler = SimpleChannelPoolHandler.IO_HANDLER_MAP.get(channel.id());
                     if (ioHandler != null) {
-                        //请求唯一标识序列化
-                        byte[] headerBytes = MessagePackUtils.serialize(transHeader);
-                        //请求体序列化
-                        byte[] contentBytes = MessagePackUtils.serialize(transContent);
-                        //TCP发送数据包，并对发送数据序列化
-                        DataPacket packet = new DataPacket(headerBytes, contentBytes);
                         synchronized (ioHandler.object) {
                             //发送TCP请求
-                            ch.writeAndFlush(packet);
+                            channel.writeAndFlush(packet);
                             //等待请求返回结果
                             ioHandler.object.wait(this.properties.getReadTimeOut().toMillis());
                         }
@@ -156,26 +149,26 @@ public class ClientConnection {
                         if (ioHandler.result == null) {
                             //todo
                         } else {
-                            response = MessagePackUtils.deSerialize(ioHandler.result.content, reference);
+                            response = ioHandler.result;
                         }
-                        //释放返回结果
-                        ioHandler.result = null;
                     } else {
                         //todo
                     }
                 } else {
                     //todo
                 }
-                if (ch != null) {
-                    //释放Channel到ChannelPool
-                    channelPool.release(ch);
-                }
-
             } else {
                 //todo
             }
         } catch (Exception exception) {
             //todo
+        } finally {
+            if (Objects.nonNull(pool) && Objects.nonNull(channel)) {
+                pool.release(channel);
+            }
+            if (Objects.nonNull(ioHandler)) {
+                ioHandler.result = null;
+            }
         }
         return response;
     }

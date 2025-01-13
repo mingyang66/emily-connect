@@ -1,6 +1,7 @@
 package com.emily.connect.server.handler;
 
 import com.emily.connect.core.protocol.DataPacket;
+import com.emily.connect.core.protocol.RequestEntity;
 import com.emily.connect.core.protocol.TransContent;
 import com.emily.connect.core.utils.MessagePackUtils;
 import io.netty.channel.ChannelHandlerContext;
@@ -43,21 +44,21 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
         }
         try {
             //请求消息
-            DataPacket packet = (DataPacket) msg;
+            DataPacket requestEntity = (DataPacket) msg;
             //消息类型
-            byte packageType = packet.packageType;
+            byte packageType = requestEntity.packageType;
             //心跳包
             if (packageType == 1) {
-                String heartBeat = MessagePackUtils.deSerialize(packet.content, String.class);
+                String heartBeat = MessagePackUtils.deSerialize(requestEntity.content, String.class);
                 System.out.println("心跳包是：" + heartBeat);
                 return;
             }
             //请求消息体
-            TransContent transContent = MessagePackUtils.deSerialize(packet.content, TransContent.class);
+            TransContent transContent = MessagePackUtils.deSerialize(requestEntity.content, TransContent.class);
             //获取后置处理结果
             Object value = this.handler.invoke(transContent);
             //发送调用方法调用结果
-            ctx.writeAndFlush(new DataPacket(packet.header, MessagePackUtils.serialize(value)));
+            ctx.writeAndFlush(new DataPacket(requestEntity.header, MessagePackUtils.serialize(value)));
         } catch (Exception exception) {
             exception.printStackTrace();
         } finally {
