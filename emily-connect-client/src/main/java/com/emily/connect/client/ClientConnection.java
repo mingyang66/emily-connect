@@ -108,13 +108,14 @@ public class ClientConnection {
         byte[] headerBytes = MessagePackUtils.serialize(transHeader);
         //请求体序列化
         byte[] bodyBytes = MessagePackUtils.serialize(transContent);
-        //TCP发送数据包，并对发送数据序列化
-        //DataPacket packet = new DataPacket(headerBytes, bodyBytes);
         // 创建一个ByteBuf实例
         ByteBuf byteBuf = Unpooled.buffer();
         // 向ByteBuf中写入数据
         byteBuf.writeByte(0);
-        byteBuf.writeInt(42);          // 写入一个整数
+        byteBuf.writeInt(headerBytes.length);          // 写入一个整数
+        byteBuf.writeInt(bodyBytes.length);
+        byteBuf.writeBytes(headerBytes);
+        byteBuf.writeBytes(bodyBytes);
         // 获取ByteBuf中可读字节的数量
         int readableBytes = byteBuf.readableBytes();
         // 创建一个字节数组来存储ByteBuf中的数据

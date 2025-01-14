@@ -18,7 +18,8 @@ public class ConnectClientBootStrap {
     private static final ClientConnection connection = new ClientConnection(new ClientProperties());
 
     public static void main(String[] args) {
-
+        System.out.println(Integer.MAX_VALUE > 65535);
+        System.out.println(Integer.MAX_VALUE );
         for (int i = 0; i < 5000; i++) {
             try {
                 Object list = selectBody(String.valueOf(i));

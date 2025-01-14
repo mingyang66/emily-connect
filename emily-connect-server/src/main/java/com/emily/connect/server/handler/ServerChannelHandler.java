@@ -6,6 +6,8 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.ReferenceCountUtil;
 
+import java.nio.charset.StandardCharsets;
+
 /**
  * @program: SkyDb
  * @description:
@@ -48,7 +50,15 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
                 if (byteBuf.isReadable()) {
                     byte prefix = byteBuf.readByte();
                     if (prefix == 0) {
-                        System.out.println("读取正文消息：" + byteBuf.readInt());
+                        System.out.println("读取正文消息：");
+                        int headerLength = byteBuf.readInt();
+                        int bodyLength = byteBuf.readInt();
+                        byte[] header = new byte[headerLength];
+                        byte[] body = new byte[bodyLength];
+                        byteBuf.readBytes(header);
+                        byteBuf.readBytes(body);
+                        System.out.println("请求头：" + new String(header, StandardCharsets.UTF_8));
+                        System.out.println("请求体：" + new String(body, StandardCharsets.UTF_8));
                     } else if (prefix == 1) {
                         System.out.println("读取心跳消息：" + byteBuf.readInt());
 
