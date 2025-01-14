@@ -1,5 +1,7 @@
 package com.emily.connect.server.handler;
 
+import com.emily.connect.core.protocol.RequestHeader;
+import com.emily.connect.core.utils.ByteBufUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -51,14 +53,13 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
                     byte prefix = byteBuf.readByte();
                     if (prefix == 0) {
                         System.out.println("读取正文消息：");
-                        int headerLength = byteBuf.readInt();
-                        int bodyLength = byteBuf.readInt();
-                        byte[] header = new byte[headerLength];
-                        byte[] body = new byte[bodyLength];
-                        byteBuf.readBytes(header);
-                        byteBuf.readBytes(body);
-                        System.out.println("请求头：" + new String(header, StandardCharsets.UTF_8));
-                        System.out.println("请求体：" + new String(body, StandardCharsets.UTF_8));
+                        RequestHeader header = new RequestHeader()
+                                .traceId(ByteBufUtils.readString(byteBuf))
+                                .appType(ByteBufUtils.readString(byteBuf))
+                                .appVersion(ByteBufUtils.readString(byteBuf))
+                                .systemNumber(ByteBufUtils.readString(byteBuf));
+                        System.out.println("请求头：" + header.getTraceId() + "-" + header.getAppType() + "-" + header.getAppVersion() + "-" + header.getSystemNumber());
+                        System.out.println("请求体：" + ByteBufUtils.readString(byteBuf));
                     } else if (prefix == 1) {
                         System.out.println("读取心跳消息：");
                         int bodyLength = byteBuf.readInt();

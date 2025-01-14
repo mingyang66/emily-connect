@@ -2,8 +2,8 @@ package com.emily.connect.sample.client;
 
 import com.emily.connect.client.ClientConnection;
 import com.emily.connect.client.ClientProperties;
+import com.emily.connect.core.protocol.RequestHeader;
 import com.emily.connect.core.protocol.TransContent;
-import com.emily.connect.core.protocol.TransHeader;
 import com.emily.connect.core.utils.UUIDUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 
@@ -55,8 +55,12 @@ public class ConnectClientBootStrap {
      * @throws Exception
      */
     public static Object executeQuery(TransContent transContent) throws Exception {
-        TransHeader transHeader = new TransHeader(UUIDUtils.randomSimpleUUID());
-        Object list = connection.getForEntity(transHeader, transContent, new TypeReference<>() {
+        RequestHeader requestHeader = new RequestHeader()
+                .traceId(UUIDUtils.randomSimpleUUID())
+                .appType("com.android")
+                .appVersion("6.8")
+                .systemNumber("Emily-Sdk");
+        Object list = connection.getForEntity(requestHeader, transContent, new TypeReference<>() {
         });
         return list;
     }

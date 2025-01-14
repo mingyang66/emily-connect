@@ -2,9 +2,8 @@ package com.emily.connect.client;
 
 import com.emily.connect.client.handler.ClientChannelHandler;
 import com.emily.connect.client.handler.SimpleChannelPoolHandler;
-import com.emily.connect.core.protocol.DataPacket;
+import com.emily.connect.core.protocol.RequestHeader;
 import com.emily.connect.core.protocol.TransContent;
-import com.emily.connect.core.protocol.TransHeader;
 import com.emily.connect.core.utils.MessagePackUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import io.netty.bootstrap.Bootstrap;
@@ -99,22 +98,19 @@ public class ClientConnection {
     /**
      * 发送请求
      *
-     * @param transHeader  请求头
+     * @param requestHeader  请求头
      * @param transContent 请求体
      * @param reference    返回值数据类型
      */
-    public <T> T getForEntity(TransHeader transHeader, TransContent transContent, TypeReference<? extends T> reference) throws IOException {
-        //请求唯一标识序列化
-        byte[] headerBytes = MessagePackUtils.serialize(transHeader);
+    public <T> T getForEntity(RequestHeader requestHeader, TransContent transContent, TypeReference<? extends T> reference) throws IOException {
         //请求体序列化
         byte[] bodyBytes = MessagePackUtils.serialize(transContent);
         // 创建一个ByteBuf实例
         ByteBuf byteBuf = Unpooled.buffer();
         // 向ByteBuf中写入数据
         byteBuf.writeByte(0);
-        byteBuf.writeInt(headerBytes.length);          // 写入一个整数
+        byteBuf.writeBytes(requestHeader.toByteArray());
         byteBuf.writeInt(bodyBytes.length);
-        byteBuf.writeBytes(headerBytes);
         byteBuf.writeBytes(bodyBytes);
         // 获取ByteBuf中可读字节的数量
         int readableBytes = byteBuf.readableBytes();
@@ -122,6 +118,7 @@ public class ClientConnection {
         byte[] array = new byte[readableBytes];
         // 将ByteBuf中的数据读到字节数组中
         byteBuf.readBytes(array);
+        byteBuf.release();
         byte[] pack = getForObject(array);
         //根据返回结果做后续处理
         if (pack == null) {

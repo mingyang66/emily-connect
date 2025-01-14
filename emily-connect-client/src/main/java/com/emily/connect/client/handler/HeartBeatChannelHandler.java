@@ -1,8 +1,5 @@
 package com.emily.connect.client.handler;
 
-import com.emily.connect.core.protocol.TransHeader;
-import com.emily.connect.core.utils.MessagePackUtils;
-import com.emily.connect.core.utils.UUIDUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
