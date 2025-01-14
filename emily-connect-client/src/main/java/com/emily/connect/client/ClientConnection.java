@@ -4,6 +4,7 @@ import com.emily.connect.client.handler.ClientChannelHandler;
 import com.emily.connect.client.handler.SimpleChannelPoolHandler;
 import com.emily.connect.core.protocol.RequestHeader;
 import com.emily.connect.core.protocol.TransContent;
+import com.emily.connect.core.utils.ByteBufUtils;
 import com.emily.connect.core.utils.MessagePackUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import io.netty.bootstrap.Bootstrap;
@@ -112,12 +113,8 @@ public class ClientConnection {
         byteBuf.writeBytes(requestHeader.toByteArray());
         byteBuf.writeInt(bodyBytes.length);
         byteBuf.writeBytes(bodyBytes);
-        // 获取ByteBuf中可读字节的数量
-        int readableBytes = byteBuf.readableBytes();
         // 创建一个字节数组来存储ByteBuf中的数据
-        byte[] array = new byte[readableBytes];
-        // 将ByteBuf中的数据读到字节数组中
-        byteBuf.readBytes(array);
+        byte[] array = ByteBufUtils.readBytes(byteBuf);
         byteBuf.release();
         byte[] pack = getForObject(array);
         //根据返回结果做后续处理

@@ -75,9 +75,7 @@ public class RequestHeader {
         ByteBufUtils.writeString(byteBuf, this.appVersion);
         ByteBufUtils.writeString(byteBuf, this.systemNumber);
         // 创建一个字节数组来存储ByteBuf中的数据
-        byte[] byteArray = new byte[byteBuf.readableBytes()];
-        // 将ByteBuf中的数据读到字节数组中
-        byteBuf.readBytes(byteArray);
+        byte[] byteArray = ByteBufUtils.readBytes(byteBuf);
         // 释放ByteBuf的资源
         byteBuf.release();
         return byteArray;
