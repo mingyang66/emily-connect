@@ -1,9 +1,10 @@
 package com.emily.connect.client.handler;
 
-import com.emily.connect.core.protocol.DataPacket;
 import com.emily.connect.core.protocol.TransHeader;
 import com.emily.connect.core.utils.MessagePackUtils;
 import com.emily.connect.core.utils.UUIDUtils;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.timeout.IdleStateEvent;
@@ -26,8 +27,22 @@ public class HeartBeatChannelHandler extends ChannelInboundHandlerAdapter {
                         TransHeader transHeader = new TransHeader(UUIDUtils.randomSimpleUUID());
                         //序列化请求头
                         byte[] header = MessagePackUtils.serialize(transHeader);
+                        // 创建一个ByteBuf实例
+                        ByteBuf byteBuf = Unpooled.buffer();
+
+                        // 向ByteBuf中写入数据
+                        byteBuf.writeByte(1);          // 写入一个整数
+                        byteBuf.writeInt(43);
+                        // 获取ByteBuf中可读字节的数量
+                        int readableBytes = byteBuf.readableBytes();
+
+                        // 创建一个字节数组来存储ByteBuf中的数据
+                        byte[] array = new byte[readableBytes];
+
+                        // 将ByteBuf中的数据读到字节数组中
+                        byteBuf.readBytes(array);
                         //发送心跳包
-                        ctx.channel().writeAndFlush(new DataPacket((byte) 1, header, MessagePackUtils.serialize("heartBeat...")));
+                        ctx.channel().writeAndFlush(array);
                         break;
                     case ALL_IDLE:
                     default:

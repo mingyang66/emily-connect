@@ -8,6 +8,8 @@ import com.emily.connect.core.protocol.TransHeader;
 import com.emily.connect.core.utils.MessagePackUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
@@ -107,22 +109,34 @@ public class ClientConnection {
         //请求体序列化
         byte[] bodyBytes = MessagePackUtils.serialize(transContent);
         //TCP发送数据包，并对发送数据序列化
-        DataPacket packet = new DataPacket(headerBytes, bodyBytes);
-        DataPacket pack = getForObject(packet);
+        //DataPacket packet = new DataPacket(headerBytes, bodyBytes);
+        // 创建一个ByteBuf实例
+        ByteBuf byteBuf = Unpooled.buffer();
+        // 向ByteBuf中写入数据
+        byteBuf.writeByte(0);
+        byteBuf.writeInt(42);          // 写入一个整数
+        // 获取ByteBuf中可读字节的数量
+        int readableBytes = byteBuf.readableBytes();
+        // 创建一个字节数组来存储ByteBuf中的数据
+        byte[] array = new byte[readableBytes];
+        // 将ByteBuf中的数据读到字节数组中
+        byteBuf.readBytes(array);
+        byte[] pack = getForObject(array);
         //根据返回结果做后续处理
         if (pack == null) {
             //todo
             return null;
         } else {
-            return MessagePackUtils.deSerialize(pack.content, reference);
+            // return MessagePackUtils.deSerialize(pack.content, reference);
+            return null;
         }
     }
 
     /**
      * 发送请求
      */
-    public DataPacket getForObject(DataPacket packet) {
-        DataPacket response = null;
+    public byte[] getForObject(byte[] packet) {
+        byte[] response = null;
         ChannelPool pool = getChannelPool(new InetSocketAddress("127.0.0.1", 9999));
         Channel channel = null;
         ClientChannelHandler ioHandler = null;

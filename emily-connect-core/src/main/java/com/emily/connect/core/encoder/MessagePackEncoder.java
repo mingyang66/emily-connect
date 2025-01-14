@@ -1,6 +1,5 @@
 package com.emily.connect.core.encoder;
 
-import com.emily.connect.core.utils.MessagePackUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
@@ -11,10 +10,10 @@ import io.netty.handler.codec.MessageToByteEncoder;
  * @author: Emily
  * @create: 2021/09/23
  */
-public class MessagePackEncoder extends MessageToByteEncoder<Object> {
+public class MessagePackEncoder extends MessageToByteEncoder<byte[]> {
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, Object msg, ByteBuf byteBuf) throws Exception {
-        byteBuf.writeBytes(MessagePackUtils.serialize(msg));
+    protected void encode(ChannelHandlerContext ctx, byte[] bytes, ByteBuf byteBuf) throws Exception {
+        byteBuf.writeBytes(bytes);
     }
 }

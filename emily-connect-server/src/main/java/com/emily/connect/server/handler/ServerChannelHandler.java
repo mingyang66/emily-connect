@@ -1,9 +1,7 @@
 package com.emily.connect.server.handler;
 
-import com.emily.connect.core.protocol.DataPacket;
-import com.emily.connect.core.protocol.RequestEntity;
-import com.emily.connect.core.protocol.TransContent;
-import com.emily.connect.core.utils.MessagePackUtils;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.ReferenceCountUtil;
@@ -43,22 +41,39 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
             return;
         }
         try {
-            //请求消息
-            DataPacket requestEntity = (DataPacket) msg;
-            //消息类型
-            byte packageType = requestEntity.packageType;
-            //心跳包
-            if (packageType == 1) {
-                String heartBeat = MessagePackUtils.deSerialize(requestEntity.content, String.class);
-                System.out.println("心跳包是：" + heartBeat);
-                return;
+            if (msg instanceof byte[] array) {
+                // 通过现成的byte数组创建一个ByteBuf对象
+                ByteBuf byteBuf = Unpooled.wrappedBuffer(array);
+                // 打印ByteBuf中的数据以验证
+                if (byteBuf.isReadable()) {
+                    byte prefix = byteBuf.readByte();
+                    if (prefix == 0) {
+                        System.out.println("读取正文消息：" + byteBuf.readInt());
+                    } else if (prefix == 1) {
+                        System.out.println("读取心跳消息：" + byteBuf.readInt());
+
+                    }
+                }
+            } else {
+                //todo 非可识别数据类型
+                System.out.println("----非可识别数据类型----");
             }
+
+
+            //消息类型
+            // byte packageType = requestEntity.packageType;
+            //心跳包
+            // if (packageType == 1) {
+            //   String heartBeat = MessagePackUtils.deSerialize(requestEntity.content, String.class);
+            // System.out.println("心跳包是：" + heartBeat);
+            //return;
+            //}
             //请求消息体
-            TransContent transContent = MessagePackUtils.deSerialize(requestEntity.content, TransContent.class);
+            //TransContent transContent = MessagePackUtils.deSerialize(requestEntity.content, TransContent.class);
             //获取后置处理结果
-            Object value = this.handler.invoke(transContent);
+            //Object value = this.handler.invoke(transContent);
             //发送调用方法调用结果
-            ctx.writeAndFlush(new DataPacket(requestEntity.header, MessagePackUtils.serialize(value)));
+            //ctx.writeAndFlush(new DataPacket(requestEntity.header, MessagePackUtils.serialize(value)));
         } catch (Exception exception) {
             exception.printStackTrace();
         } finally {

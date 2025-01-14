@@ -12,6 +12,7 @@ import java.util.UUID;
  */
 public class UUIDUtils {
     public static final String LINE_THROUGH_CENTER = "-";
+
     /**
      * 生成简洁版UUID，即：删除横杠的UUID
      */
@@ -21,7 +22,6 @@ public class UUIDUtils {
 
     /**
      * 生成唯一标识
-     *
      */
     public static String randomUUID() {
         return UUID.randomUUID().toString();
