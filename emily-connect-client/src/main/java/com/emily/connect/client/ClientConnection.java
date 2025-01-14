@@ -98,9 +98,9 @@ public class ClientConnection {
     /**
      * 发送请求
      *
-     * @param requestHeader  请求头
-     * @param transContent 请求体
-     * @param reference    返回值数据类型
+     * @param requestHeader 请求头
+     * @param transContent  请求体
+     * @param reference     返回值数据类型
      */
     public <T> T getForEntity(RequestHeader requestHeader, TransContent transContent, TypeReference<? extends T> reference) throws IOException {
         //请求体序列化
