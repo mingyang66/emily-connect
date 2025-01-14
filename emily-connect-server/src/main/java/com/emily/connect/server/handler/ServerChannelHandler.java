@@ -60,8 +60,11 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
                         System.out.println("请求头：" + new String(header, StandardCharsets.UTF_8));
                         System.out.println("请求体：" + new String(body, StandardCharsets.UTF_8));
                     } else if (prefix == 1) {
-                        System.out.println("读取心跳消息：" + byteBuf.readInt());
-
+                        System.out.println("读取心跳消息：");
+                        int bodyLength = byteBuf.readInt();
+                        byte[] body = new byte[bodyLength];
+                        byteBuf.readBytes(body);
+                        System.out.println("心跳请求体：" + new String(body, StandardCharsets.UTF_8));
                     }
                 }
             } else {
