@@ -33,6 +33,13 @@ public class ByteBufUtils {
         byteBuf.writeBytes(bytes);
     }
 
+    public static byte[] readBytesByLen(ByteBuf byteBuf) {
+        int len = byteBuf.readInt();
+        byte[] array = new byte[len];
+        byteBuf.readBytes(array, 0, len);
+        return array;
+    }
+
     public static byte[] readBytes(ByteBuf byteBuf) {
         // 获取ByteBuf中可读字节的数量
         int readableBytes = byteBuf.readableBytes();

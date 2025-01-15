@@ -2,7 +2,6 @@ package com.emily.connect.server;
 
 import com.emily.connect.core.decoder.MessagePackDecoder;
 import com.emily.connect.core.encoder.MessagePackEncoder;
-import com.emily.connect.server.handler.ServerBusinessHandler;
 import com.emily.connect.server.handler.ServerChannelHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
@@ -30,16 +29,11 @@ public class ServerConnection {
      */
     private final EventLoopGroup workerGroup = new NioEventLoopGroup();
     /**
-     * 后置业务处理类
-     */
-    private final ServerBusinessHandler handler;
-    /**
      * 属性配置
      */
     private final ServerProperties properties;
 
-    public ServerConnection(ServerBusinessHandler handler, ServerProperties properties) {
-        this.handler = handler;
+    public ServerConnection(ServerProperties properties) {
         this.properties = properties;
     }
 
@@ -114,7 +108,7 @@ public class ServerConnection {
                             //自定义编码器
                             pipeline.addLast(new MessagePackEncoder());
                             //自定义处理器
-                            pipeline.addLast(new ServerChannelHandler(handler));
+                            pipeline.addLast(new ServerChannelHandler());
                         }
                     });
             //启动服务器，并绑定端口并且同步

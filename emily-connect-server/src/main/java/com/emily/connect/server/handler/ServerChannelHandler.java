@@ -2,6 +2,9 @@ package com.emily.connect.server.handler;
 
 import com.emily.connect.core.protocol.RequestHeader;
 import com.emily.connect.core.utils.ByteBufUtils;
+import com.emily.connect.server.plugin.Plugin;
+import com.emily.connect.server.plugin.PluginRegistry;
+import com.emily.connect.server.plugin.PluginType;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -17,12 +20,6 @@ import java.nio.charset.StandardCharsets;
  * @create: 2021/09/17
  */
 public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
-
-    private final ServerBusinessHandler handler;
-
-    public ServerChannelHandler(ServerBusinessHandler handler) {
-        this.handler = handler;
-    }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
@@ -52,19 +49,25 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
                 if (byteBuf.isReadable()) {
                     byte prefix = byteBuf.readByte();
                     if (prefix == 0) {
-                        System.out.println("读取正文消息：");
                         RequestHeader header = new RequestHeader()
+                                .systemNumber(ByteBufUtils.readString(byteBuf))
                                 .traceId(ByteBufUtils.readString(byteBuf))
                                 .appType(ByteBufUtils.readString(byteBuf))
                                 .appVersion(ByteBufUtils.readString(byteBuf))
-                                .systemNumber(ByteBufUtils.readString(byteBuf));
-                        System.out.println("请求头：" + header.getTraceId() + "-" + header.getAppType() + "-" + header.getAppVersion() + "-" + header.getSystemNumber());
-                        System.out.println("请求体：" + ByteBufUtils.readString(byteBuf));
+                                .contentType(byteBuf.readByte());
+                        byte[] payload = ByteBufUtils.readBytesByLen(byteBuf);
+                        //System.out.println("请求体：" + ByteBufUtils.readString(byteBuf));
                         //String str = new String(ByteBufUtils.readBytes(byteBuf), StandardCharsets.UTF_8);
                         // String str = JsonUtils.toObject(ByteBufUtils.readBytes(byteBuf), String.class);
                         //String body = MessagePackUtils.deSerialize(ByteBufUtils.readBytes(byteBuf), String.class);
                         // System.out.println(body + "--反序列化");
                         //  System.out.println(str);
+                        Plugin<?> plugin = switch (header.getContentType()) {
+                            case 0 -> PluginRegistry.getPlugin(PluginType.BEAN);
+                            case 1 -> PluginRegistry.getPlugin(PluginType.STRING);
+                            default -> null;
+                        };
+                        Object response = plugin.invoke(header, payload);
                     } else if (prefix == 1) {
                         System.out.println("读取心跳消息：");
                         int bodyLength = byteBuf.readInt();

@@ -9,10 +9,11 @@ import io.netty.buffer.Unpooled;
  * @since :  2025/1/10 下午3:03
  */
 public class RequestHeader {
+    private String systemNumber;
     private String traceId;
     private String appType;
     private String appVersion;
-    private String systemNumber;
+    private byte contentType;
 
     public String getTraceId() {
         return traceId;
@@ -46,6 +47,14 @@ public class RequestHeader {
         this.systemNumber = systemNumber;
     }
 
+    public byte getContentType() {
+        return contentType;
+    }
+
+    public void setContentType(byte contentType) {
+        this.contentType = contentType;
+    }
+
     public RequestHeader traceId(String traceId) {
         this.traceId = traceId;
         return this;
@@ -66,14 +75,20 @@ public class RequestHeader {
         return this;
     }
 
+    public RequestHeader contentType(byte contentType) {
+        this.contentType = contentType;
+        return this;
+    }
+
     public byte[] toByteArray() {
         // 创建一个ByteBuf实例
         ByteBuf byteBuf = Unpooled.buffer();
         // 将每个字符串写入ByteBuf
+        ByteBufUtils.writeString(byteBuf, this.systemNumber);
         ByteBufUtils.writeString(byteBuf, this.traceId);
         ByteBufUtils.writeString(byteBuf, this.appType);
         ByteBufUtils.writeString(byteBuf, this.appVersion);
-        ByteBufUtils.writeString(byteBuf, this.systemNumber);
+        byteBuf.writeByte(this.contentType);
         // 创建一个字节数组来存储ByteBuf中的数据
         byte[] byteArray = ByteBufUtils.readBytes(byteBuf);
         // 释放ByteBuf的资源

@@ -106,15 +106,15 @@ public class ClientConnection {
      */
     public <T> T getForEntity(RequestHeader requestHeader, RequestBody requestBody, TypeReference<? extends T> reference) throws IOException {
         //请求体序列化
-        byte[] bodyBytes = JsonUtils.toJSONString(requestBody).getBytes(StandardCharsets.UTF_8);
+        byte[] payload = JsonUtils.toJSONString(requestBody).getBytes(StandardCharsets.UTF_8);
         System.out.println(JsonUtils.toJSONString(requestBody));
         // 创建一个ByteBuf实例
         ByteBuf byteBuf = Unpooled.buffer();
         // 向ByteBuf中写入数据
         byteBuf.writeByte(0);
         byteBuf.writeBytes(requestHeader.toByteArray());
-        byteBuf.writeInt(bodyBytes.length);
-        byteBuf.writeBytes(bodyBytes);
+        byteBuf.writeInt(payload.length);
+        byteBuf.writeBytes(payload);
         // 创建一个字节数组来存储ByteBuf中的数据
         byte[] array = ByteBufUtils.readBytes(byteBuf);
         byteBuf.release();

@@ -57,7 +57,8 @@ public class ConnectClientBootStrap {
                 .traceId(UUIDUtils.randomSimpleUUID())
                 .appType("com.android")
                 .appVersion("6.8")
-                .systemNumber("Emily-Sdk");
+                .systemNumber("Emily-Sdk")
+                .contentType((byte) 0);
         return connection.getForEntity(requestHeader, requestBody, new TypeReference<>() {
         });
     }
