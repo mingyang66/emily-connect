@@ -60,6 +60,11 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
                                 .systemNumber(ByteBufUtils.readString(byteBuf));
                         System.out.println("请求头：" + header.getTraceId() + "-" + header.getAppType() + "-" + header.getAppVersion() + "-" + header.getSystemNumber());
                         System.out.println("请求体：" + ByteBufUtils.readString(byteBuf));
+                        //String str = new String(ByteBufUtils.readBytes(byteBuf), StandardCharsets.UTF_8);
+                        // String str = JsonUtils.toObject(ByteBufUtils.readBytes(byteBuf), String.class);
+                        //String body = MessagePackUtils.deSerialize(ByteBufUtils.readBytes(byteBuf), String.class);
+                        // System.out.println(body + "--反序列化");
+                        //  System.out.println(str);
                     } else if (prefix == 1) {
                         System.out.println("读取心跳消息：");
                         int bodyLength = byteBuf.readInt();

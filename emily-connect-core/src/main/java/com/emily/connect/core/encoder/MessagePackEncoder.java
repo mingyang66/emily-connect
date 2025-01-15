@@ -6,14 +6,14 @@ import io.netty.handler.codec.MessageToByteEncoder;
 
 /**
  * @program: SkyDb
- * @description: Rpc编码器 protobuf[https://github.com/protocolbuffers/protobuf/releases]
+ * @description: Rpc编码器 protobuf[<a href="https://github.com/protocolbuffers/protobuf/releases">...</a>]
  * @author: Emily
  * @create: 2021/09/23
  */
 public class MessagePackEncoder extends MessageToByteEncoder<byte[]> {
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, byte[] bytes, ByteBuf byteBuf) throws Exception {
+    protected void encode(ChannelHandlerContext ctx, byte[] bytes, ByteBuf byteBuf) {
         byteBuf.writeBytes(bytes);
     }
 }

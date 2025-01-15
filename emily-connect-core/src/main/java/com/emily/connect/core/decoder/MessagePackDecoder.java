@@ -15,7 +15,7 @@ import java.util.List;
 public class MessagePackDecoder extends ByteToMessageDecoder {
 
     @Override
-    protected void decode(ChannelHandlerContext ctx, ByteBuf buf, List<Object> list) throws Exception {
+    protected void decode(ChannelHandlerContext ctx, ByteBuf buf, List<Object> list) {
         byte[] data = new byte[buf.readableBytes()];
         buf.readBytes(data);
         list.add(data);
