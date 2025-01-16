@@ -54,7 +54,8 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
                                 .traceId(ByteBufUtils.readString(byteBuf))
                                 .appType(ByteBufUtils.readString(byteBuf))
                                 .appVersion(ByteBufUtils.readString(byteBuf))
-                                .contentType(byteBuf.readByte());
+                                .contentType(byteBuf.readByte())
+                                .action(ByteBufUtils.readString(byteBuf));
                         byte[] payload = ByteBufUtils.readBytesByLen(byteBuf);
                         //System.out.println("请求体：" + ByteBufUtils.readString(byteBuf));
                         //String str = new String(ByteBufUtils.readBytes(byteBuf), StandardCharsets.UTF_8);

@@ -1,5 +1,6 @@
 package com.emily.connect.server.plugin;
 
+import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -9,6 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class PluginRegistry {
     public static final Map<PluginType, Plugin<?>> plugins = new ConcurrentHashMap<>();
+    public static final Map<String, Method> BEANS = new ConcurrentHashMap<>();
 
     public static void registerPlugin(PluginType pluginType, Plugin<?> plugin) {
         plugins.putIfAbsent(pluginType, plugin);

@@ -14,6 +14,7 @@ public class RequestHeader {
     private String appType;
     private String appVersion;
     private byte contentType;
+    private String action;
 
     public String getTraceId() {
         return traceId;
@@ -45,6 +46,14 @@ public class RequestHeader {
 
     public void setSystemNumber(String systemNumber) {
         this.systemNumber = systemNumber;
+    }
+
+    public String getAction() {
+        return action;
+    }
+
+    public void setAction(String action) {
+        this.action = action;
     }
 
     public byte getContentType() {
@@ -80,6 +89,11 @@ public class RequestHeader {
         return this;
     }
 
+    public RequestHeader action(String action) {
+        this.action = action;
+        return this;
+    }
+
     public byte[] toByteArray() {
         // 创建一个ByteBuf实例
         ByteBuf byteBuf = Unpooled.buffer();
@@ -89,6 +103,7 @@ public class RequestHeader {
         ByteBufUtils.writeString(byteBuf, this.appType);
         ByteBufUtils.writeString(byteBuf, this.appVersion);
         byteBuf.writeByte(this.contentType);
+        ByteBufUtils.writeString(byteBuf, this.action);
         // 创建一个字节数组来存储ByteBuf中的数据
         byte[] byteArray = ByteBufUtils.readBytes(byteBuf);
         // 释放ByteBuf的资源

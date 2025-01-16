@@ -58,7 +58,8 @@ public class ConnectClientBootStrap {
                 .appType("com.android")
                 .appVersion("6.8")
                 .systemNumber("Emily-Sdk")
-                .contentType((byte) 0);
+                .contentType((byte) 0)
+                .action("/api/user/getUser");
         return connection.getForEntity(requestHeader, requestBody, new TypeReference<>() {
         });
     }
