@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * @author :  姚明洋
+ * @author :  Emily
  * @since :  2025/1/15 下午4:54
  */
 public class PluginRegistry {

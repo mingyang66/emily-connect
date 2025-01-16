@@ -3,7 +3,7 @@ package com.emily.connect.server.plugin;
 import com.emily.connect.core.protocol.RequestHeader;
 
 /**
- * @author :  姚明洋
+ * @author :  Emily
  * @since :  2025/1/15 下午4:20
  */
 public interface Plugin<T> {

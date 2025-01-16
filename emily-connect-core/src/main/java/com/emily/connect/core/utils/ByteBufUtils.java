@@ -7,7 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 /**
- * @author :  姚明洋
+ * @author :  Emily
  * @since :  2025/1/14 下午1:50
  */
 public class ByteBufUtils {

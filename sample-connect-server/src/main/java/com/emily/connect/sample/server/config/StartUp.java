@@ -8,7 +8,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * @author :  姚明洋
+ * @author :  Emily
  * @since :  2025/1/16 下午2:24
  */
 @Configuration

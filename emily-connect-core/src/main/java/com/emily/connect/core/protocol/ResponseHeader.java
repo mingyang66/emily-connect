@@ -1,7 +1,7 @@
 package com.emily.connect.core.protocol;
 
 /**
- * @author :  姚明洋
+ * @author :  Emily
  * @since :  2025/1/10 下午3:03
  */
 public class ResponseHeader {
