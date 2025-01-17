@@ -9,5 +9,5 @@ import com.emily.connect.core.protocol.RequestHeader;
 public interface Plugin<T> {
     boolean supports(PluginType pluginType);
 
-    Object invoke(RequestHeader header, byte[] payload);
+    Object invoke(RequestHeader header, byte[] payload) throws Throwable;
 }

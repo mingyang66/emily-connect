@@ -96,7 +96,7 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
             //Object value = this.handler.invoke(transContent);
             //发送调用方法调用结果
             //ctx.writeAndFlush(new DataPacket(requestEntity.header, MessagePackUtils.serialize(value)));
-        } catch (Exception exception) {
+        } catch (Throwable exception) {
             exception.printStackTrace();
         } finally {
             //手动释放消息，否则会导致内存泄漏
