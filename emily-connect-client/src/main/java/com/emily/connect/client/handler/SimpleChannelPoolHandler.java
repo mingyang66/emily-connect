@@ -1,7 +1,7 @@
 package com.emily.connect.client.handler;
 
-import com.emily.connect.core.decoder.MessagePackDecoder;
-import com.emily.connect.core.encoder.MessagePackEncoder;
+import com.emily.connect.client.decoder.MessagePackDecoder;
+import com.emily.connect.client.encoder.MessagePackEncoder;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelId;
 import io.netty.channel.ChannelPipeline;

@@ -2,9 +2,9 @@ package com.emily.connect.sample.client.controller;
 
 import com.emily.connect.client.ClientConnection;
 import com.emily.connect.client.ClientProperties;
-import com.emily.connect.sample.client.entity.RequestBody;
 import com.emily.connect.core.entity.RequestHeader;
 import com.emily.connect.core.utils.UUIDUtils;
+import com.emily.connect.sample.client.entity.RequestBody;
 import com.emily.infrastructure.json.JsonUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -1,4 +1,4 @@
-package com.emily.connect.core.encoder;
+package com.emily.connect.server.encoder;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;

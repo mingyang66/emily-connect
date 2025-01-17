@@ -1,14 +1,11 @@
 package com.emily.connect.server.handler;
 
-import com.emily.connect.core.entity.RequestHeader;
-import com.emily.connect.core.utils.ByteBufUtils;
+import com.emily.connect.core.entity.RequestEntity;
 import com.emily.connect.core.utils.MessagePackUtils;
 import com.emily.connect.server.plugin.Plugin;
 import com.emily.connect.server.plugin.PluginRegistry;
 import com.emily.connect.server.plugin.PluginType;
 import com.emily.infrastructure.json.JsonUtils;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.ReferenceCountUtil;
@@ -45,36 +42,24 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
             return;
         }
         try {
-            if (msg instanceof byte[] array) {
-                // 通过现成的byte数组创建一个ByteBuf对象
-                ByteBuf byteBuf = Unpooled.wrappedBuffer(array);
+            if (msg instanceof RequestEntity entity) {
+                byte prefix = entity.getPrefix();
                 // 打印ByteBuf中的数据以验证
-                if (byteBuf.isReadable()) {
-                    byte prefix = byteBuf.readByte();
-                    if (prefix == 0) {
-                        RequestHeader header = new RequestHeader()
-                                .systemNumber(ByteBufUtils.readString(byteBuf))
-                                .traceId(ByteBufUtils.readString(byteBuf))
-                                .appType(ByteBufUtils.readString(byteBuf))
-                                .appVersion(ByteBufUtils.readString(byteBuf))
-                                .contentType(byteBuf.readByte())
-                                .action(ByteBufUtils.readString(byteBuf));
-                        byte[] payload = ByteBufUtils.readBytesByLen(byteBuf);
-                        Plugin<?> plugin = switch (header.getContentType()) {
-                            case 0 -> PluginRegistry.getPlugin(PluginType.BEAN);
-                            case 1 -> PluginRegistry.getPlugin(PluginType.STRING);
-                            default -> null;
-                        };
-                        Object response = plugin.invoke(header, payload);
-                        //发送调用方法调用结果
-                        ctx.writeAndFlush(MessagePackUtils.serialize(JsonUtils.toJSONString(response)));
-                    } else if (prefix == 1) {
-                        System.out.println("读取心跳消息：");
-                        int bodyLength = byteBuf.readInt();
-                        byte[] body = new byte[bodyLength];
-                        byteBuf.readBytes(body);
-                        System.out.println("心跳请求体：" + new String(body, StandardCharsets.UTF_8));
-                    }
+                if (prefix == 0) {
+                    Plugin<?> plugin = switch (entity.getHeaders().getContentType()) {
+                        case 0 -> PluginRegistry.getPlugin(PluginType.BEAN);
+                        case 1 -> PluginRegistry.getPlugin(PluginType.STRING);
+                        default -> null;
+                    };
+                    Object response = plugin.invoke(entity.getHeaders(), entity.getBody());
+                    //发送调用方法调用结果
+                    ctx.writeAndFlush(MessagePackUtils.serialize(JsonUtils.toJSONString(response)));
+                } else if (prefix == 1) {
+                    System.out.println("读取心跳消息：");
+                   /* int bodyLength = byteBuf.readInt();
+                    byte[] body = new byte[bodyLength];
+                    byteBuf.readBytes(body);*/
+                    System.out.println("心跳请求体：" + new String(entity.getBody(), StandardCharsets.UTF_8));
                 }
             } else {
                 //todo 非可识别数据类型

@@ -2,13 +2,11 @@ package com.emily.connect.client;
 
 import com.emily.connect.client.handler.ClientChannelHandler;
 import com.emily.connect.client.handler.SimpleChannelPoolHandler;
+import com.emily.connect.core.entity.RequestEntity;
 import com.emily.connect.core.entity.RequestHeader;
-import com.emily.connect.core.utils.ByteBufUtils;
 import com.emily.connect.core.utils.MessagePackUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
@@ -104,7 +102,7 @@ public class ClientConnection {
      */
     public <T> T getForEntity(RequestHeader requestHeader, byte[] payload, TypeReference<? extends T> reference) throws IOException {
         // 创建一个ByteBuf实例
-        ByteBuf byteBuf = Unpooled.buffer();
+        /*ByteBuf byteBuf = Unpooled.buffer();
         // 向ByteBuf中写入数据
         byteBuf.writeByte(0);
         byteBuf.writeBytes(requestHeader.toByteArray());
@@ -112,8 +110,12 @@ public class ClientConnection {
         byteBuf.writeBytes(payload);
         // 创建一个字节数组来存储ByteBuf中的数据
         byte[] array = ByteBufUtils.readBytes(byteBuf);
-        byteBuf.release();
-        byte[] pack = getForObject(array);
+        byteBuf.release();*/
+        RequestEntity entity = new RequestEntity();
+        entity.setPrefix((byte) 0);
+        entity.setHeaders(requestHeader);
+        entity.setBody(payload);
+        byte[] pack = getForObject(entity);
         //根据返回结果做后续处理
         if (pack == null) {
             //todo
@@ -126,7 +128,7 @@ public class ClientConnection {
     /**
      * 发送请求
      */
-    public byte[] getForObject(byte[] packet) {
+    public byte[] getForObject(RequestEntity entity) {
         byte[] response = null;
         ChannelPool pool = getChannelPool(new InetSocketAddress("127.0.0.1", 9999));
         Channel channel = null;
@@ -146,7 +148,7 @@ public class ClientConnection {
                     if (ioHandler != null) {
                         synchronized (ioHandler.object) {
                             //发送TCP请求
-                            channel.writeAndFlush(packet);
+                            channel.writeAndFlush(entity);
                             //等待请求返回结果
                             ioHandler.object.wait(this.properties.getReadTimeOut().toMillis());
                         }

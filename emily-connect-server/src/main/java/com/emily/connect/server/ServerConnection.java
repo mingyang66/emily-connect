@@ -1,7 +1,7 @@
 package com.emily.connect.server;
 
-import com.emily.connect.core.decoder.MessagePackDecoder;
-import com.emily.connect.core.encoder.MessagePackEncoder;
+import com.emily.connect.server.decoder.MessagePackDecoder;
+import com.emily.connect.server.encoder.MessagePackEncoder;
 import com.emily.connect.server.handler.ServerChannelHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
