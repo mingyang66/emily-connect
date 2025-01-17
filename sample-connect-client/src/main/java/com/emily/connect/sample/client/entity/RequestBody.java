@@ -1,4 +1,4 @@
-package com.emily.connect.core.protocol;
+package com.emily.connect.sample.client.entity;
 
 
 /**

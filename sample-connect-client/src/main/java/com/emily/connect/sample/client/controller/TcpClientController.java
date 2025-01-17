@@ -2,14 +2,16 @@ package com.emily.connect.sample.client.controller;
 
 import com.emily.connect.client.ClientConnection;
 import com.emily.connect.client.ClientProperties;
-import com.emily.connect.core.protocol.RequestBody;
-import com.emily.connect.core.protocol.RequestHeader;
+import com.emily.connect.sample.client.entity.RequestBody;
+import com.emily.connect.core.entity.RequestHeader;
 import com.emily.connect.core.utils.UUIDUtils;
+import com.emily.infrastructure.json.JsonUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 /**
  * @author :  姚明洋
@@ -33,7 +35,8 @@ public class TcpClientController {
                 .systemNumber("Emily-Sdk")
                 .contentType((byte) 0)
                 .action("/api/user/getUser");
-        String str = connection.getForEntity(requestHeader, requestBody, new TypeReference<>() {
+        byte[] payload = JsonUtils.toJSONString(requestBody).getBytes(StandardCharsets.UTF_8);
+        String str = connection.getForEntity(requestHeader, payload, new TypeReference<>() {
         });
         return str;
     }

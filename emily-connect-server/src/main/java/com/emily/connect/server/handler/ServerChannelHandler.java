@@ -1,6 +1,6 @@
 package com.emily.connect.server.handler;
 
-import com.emily.connect.core.protocol.RequestHeader;
+import com.emily.connect.core.entity.RequestHeader;
 import com.emily.connect.core.utils.ByteBufUtils;
 import com.emily.connect.core.utils.MessagePackUtils;
 import com.emily.connect.server.plugin.Plugin;
@@ -80,22 +80,6 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
                 //todo 非可识别数据类型
                 System.out.println("----非可识别数据类型----");
             }
-
-
-            //消息类型
-            // byte packageType = requestEntity.packageType;
-            //心跳包
-            // if (packageType == 1) {
-            //   String heartBeat = MessagePackUtils.deSerialize(requestEntity.content, String.class);
-            // System.out.println("心跳包是：" + heartBeat);
-            //return;
-            //}
-            //请求消息体
-            //TransContent transContent = MessagePackUtils.deSerialize(requestEntity.content, TransContent.class);
-            //获取后置处理结果
-            //Object value = this.handler.invoke(transContent);
-            //发送调用方法调用结果
-            //ctx.writeAndFlush(new DataPacket(requestEntity.header, MessagePackUtils.serialize(value)));
         } catch (Throwable exception) {
             exception.printStackTrace();
         } finally {

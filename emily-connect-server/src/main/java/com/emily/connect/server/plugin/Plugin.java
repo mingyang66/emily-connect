@@ -1,6 +1,6 @@
 package com.emily.connect.server.plugin;
 
-import com.emily.connect.core.protocol.RequestHeader;
+import com.emily.connect.core.entity.RequestHeader;
 
 /**
  * @author :  Emily

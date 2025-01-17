@@ -2,11 +2,9 @@ package com.emily.connect.client;
 
 import com.emily.connect.client.handler.ClientChannelHandler;
 import com.emily.connect.client.handler.SimpleChannelPoolHandler;
-import com.emily.connect.core.protocol.RequestBody;
-import com.emily.connect.core.protocol.RequestHeader;
+import com.emily.connect.core.entity.RequestHeader;
 import com.emily.connect.core.utils.ByteBufUtils;
 import com.emily.connect.core.utils.MessagePackUtils;
-import com.emily.infrastructure.json.JsonUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
@@ -25,7 +23,6 @@ import org.apache.commons.lang3.math.NumberUtils;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 /**
@@ -102,13 +99,10 @@ public class ClientConnection {
      * 发送请求
      *
      * @param requestHeader 请求头
-     * @param requestBody   请求体
+     * @param payload       请求体
      * @param reference     返回值数据类型
      */
-    public <T> T getForEntity(RequestHeader requestHeader, RequestBody requestBody, TypeReference<? extends T> reference) throws IOException {
-        //请求体序列化
-        byte[] payload = JsonUtils.toJSONString(requestBody).getBytes(StandardCharsets.UTF_8);
-        System.out.println(JsonUtils.toJSONString(requestBody));
+    public <T> T getForEntity(RequestHeader requestHeader, byte[] payload, TypeReference<? extends T> reference) throws IOException {
         // 创建一个ByteBuf实例
         ByteBuf byteBuf = Unpooled.buffer();
         // 向ByteBuf中写入数据

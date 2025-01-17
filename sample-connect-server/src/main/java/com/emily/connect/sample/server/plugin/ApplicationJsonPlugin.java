@@ -1,6 +1,6 @@
 package com.emily.connect.sample.server.plugin;
 
-import com.emily.connect.core.protocol.RequestHeader;
+import com.emily.connect.core.entity.RequestHeader;
 import com.emily.connect.server.plugin.Plugin;
 import com.emily.connect.server.plugin.PluginType;
 import com.emily.infrastructure.json.JsonUtils;
@@ -36,8 +36,6 @@ public class ApplicationJsonPlugin implements Plugin<String> {
 
     @Override
     public Object invoke(RequestHeader header, byte[] payload) throws Throwable {
-        System.out.println("请求头：" + JsonUtils.toJSONString(header));
-        System.out.println("server received:" + new String(payload, StandardCharsets.UTF_8));
         // 创建模拟请求
         MockHttpServletRequest request = new MockHttpServletRequest("POST", header.getAction());
         request.setContentType(MediaType.APPLICATION_JSON_VALUE);
