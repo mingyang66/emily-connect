@@ -1,6 +1,7 @@
 package com.emily.connect.sample.server.plugin;
 
 import com.emily.connect.core.entity.RequestHeader;
+import com.emily.connect.core.entity.ResponseEntity;
 import com.emily.connect.server.plugin.Plugin;
 import com.emily.connect.server.plugin.PluginType;
 import com.emily.infrastructure.json.JsonUtils;
@@ -35,7 +36,7 @@ public class ApplicationJsonPlugin implements Plugin<String> {
     }
 
     @Override
-    public Object invoke(RequestHeader header, byte[] payload) throws Throwable {
+    public ResponseEntity invoke(RequestHeader header, byte[] payload) throws Throwable {
         // 创建模拟请求
         MockHttpServletRequest request = new MockHttpServletRequest("POST", header.getAction());
         request.setContentType(MediaType.APPLICATION_JSON_VALUE);
@@ -46,8 +47,10 @@ public class ApplicationJsonPlugin implements Plugin<String> {
         headers.keySet().forEach(k -> request.addHeader(k, headers.get(k)));
 
         HandlerExecutionChain chain = handlerMapping.getHandler(request);
+
+        ResponseEntity entity = new ResponseEntity().prefix((byte) 0);
         if (Objects.isNull(chain)) {
-            return "请求接口不存在";
+            return entity.status(10000).message("请求接口不存在");
         }
         if (chain.getHandler() instanceof HandlerMethod handlerMethod) {
             // 获取控制器对象 (bean)
@@ -62,8 +65,8 @@ public class ApplicationJsonPlugin implements Plugin<String> {
             // 调用控制器方法
             Object result = method.invoke(controller, user, request);
             System.out.println("Result: " + result);
-            return result;
+            return entity.status(0).message("success").data(result);
         }
-        return "请求接口不存在";
+        return entity.status(10000).message("请求接口不存在");
     }
 }

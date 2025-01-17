@@ -4,8 +4,7 @@ import com.emily.connect.client.handler.ClientChannelHandler;
 import com.emily.connect.client.handler.SimpleChannelPoolHandler;
 import com.emily.connect.core.entity.RequestEntity;
 import com.emily.connect.core.entity.RequestHeader;
-import com.emily.connect.core.utils.MessagePackUtils;
-import com.fasterxml.jackson.core.type.TypeReference;
+import com.emily.connect.core.entity.ResponseEntity;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelOption;
@@ -98,38 +97,21 @@ public class ClientConnection {
      *
      * @param requestHeader 请求头
      * @param payload       请求体
-     * @param reference     返回值数据类型
      */
-    public <T> T getForEntity(RequestHeader requestHeader, byte[] payload, TypeReference<? extends T> reference) throws IOException {
-        // 创建一个ByteBuf实例
-        /*ByteBuf byteBuf = Unpooled.buffer();
-        // 向ByteBuf中写入数据
-        byteBuf.writeByte(0);
-        byteBuf.writeBytes(requestHeader.toByteArray());
-        byteBuf.writeInt(payload.length);
-        byteBuf.writeBytes(payload);
-        // 创建一个字节数组来存储ByteBuf中的数据
-        byte[] array = ByteBufUtils.readBytes(byteBuf);
-        byteBuf.release();*/
+    public ResponseEntity getForEntity(RequestHeader requestHeader, byte[] payload) throws IOException {
         RequestEntity entity = new RequestEntity();
         entity.setPrefix((byte) 0);
         entity.setHeaders(requestHeader);
         entity.setBody(payload);
-        byte[] pack = getForObject(entity);
-        //根据返回结果做后续处理
-        if (pack == null) {
-            //todo
-            return null;
-        } else {
-            return MessagePackUtils.deSerialize(pack, reference);
-        }
+        ResponseEntity pack = getForObject(entity);
+        return pack;
     }
 
     /**
      * 发送请求
      */
-    public byte[] getForObject(RequestEntity entity) {
-        byte[] response = null;
+    public ResponseEntity getForObject(RequestEntity entity) {
+        ResponseEntity response = null;
         ChannelPool pool = getChannelPool(new InetSocketAddress("127.0.0.1", 9999));
         Channel channel = null;
         ClientChannelHandler ioHandler = null;

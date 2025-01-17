@@ -1,6 +1,7 @@
 package com.emily.connect.server.plugin;
 
 import com.emily.connect.core.entity.RequestHeader;
+import com.emily.connect.core.entity.ResponseEntity;
 
 /**
  * @author :  Emily
@@ -9,5 +10,5 @@ import com.emily.connect.core.entity.RequestHeader;
 public interface Plugin<T> {
     boolean supports(PluginType pluginType);
 
-    Object invoke(RequestHeader header, byte[] payload) throws Throwable;
+    ResponseEntity invoke(RequestHeader header, byte[] payload) throws Throwable;
 }

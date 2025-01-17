@@ -1,11 +1,9 @@
 package com.emily.connect.server.handler;
 
 import com.emily.connect.core.entity.RequestEntity;
-import com.emily.connect.core.utils.MessagePackUtils;
 import com.emily.connect.server.plugin.Plugin;
 import com.emily.connect.server.plugin.PluginRegistry;
 import com.emily.connect.server.plugin.PluginType;
-import com.emily.infrastructure.json.JsonUtils;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.ReferenceCountUtil;
@@ -53,7 +51,7 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
                     };
                     Object response = plugin.invoke(entity.getHeaders(), entity.getBody());
                     //发送调用方法调用结果
-                    ctx.writeAndFlush(MessagePackUtils.serialize(JsonUtils.toJSONString(response)));
+                    ctx.writeAndFlush(response);
                 } else if (prefix == 1) {
                     System.out.println("读取心跳消息：");
                    /* int bodyLength = byteBuf.readInt();

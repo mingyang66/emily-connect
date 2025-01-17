@@ -1,5 +1,6 @@
 package com.emily.connect.client.handler;
 
+import com.emily.connect.core.entity.ResponseEntity;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
@@ -9,21 +10,21 @@ import io.netty.channel.SimpleChannelInboundHandler;
  * @author: Emily
  * @create: 2021/09/17
  */
-public class ClientChannelHandler extends SimpleChannelInboundHandler<byte[]> {
+public class ClientChannelHandler extends SimpleChannelInboundHandler<ResponseEntity> {
     /**
      * 锁对象
      */
     public final Object object = new Object();
 
-    public byte[] result;
+    public ResponseEntity result;
 
     public ClientChannelHandler() {
         System.out.println("新建handler------------DbClientChannelHandler");
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, byte[] response) throws Exception {
-        System.out.println("-----------------------channelRead0---------------------接收到响应数据--" + response.length);
+    protected void channelRead0(ChannelHandlerContext ctx, ResponseEntity response) throws Exception {
+        System.out.println("-----------------------channelRead0---------------------接收到响应数据--" + response.getMessage());
         // if (response.packageType == 0) {
         synchronized (this.object) {
             result = response;
