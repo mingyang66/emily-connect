@@ -5,6 +5,7 @@ import com.emily.connect.client.handler.SimpleChannelPoolHandler;
 import com.emily.connect.core.protocol.RequestBody;
 import com.emily.connect.core.protocol.RequestHeader;
 import com.emily.connect.core.utils.ByteBufUtils;
+import com.emily.connect.core.utils.MessagePackUtils;
 import com.emily.infrastructure.json.JsonUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import io.netty.bootstrap.Bootstrap;
@@ -124,8 +125,7 @@ public class ClientConnection {
             //todo
             return null;
         } else {
-            // return MessagePackUtils.deSerialize(pack.content, reference);
-            return null;
+            return MessagePackUtils.deSerialize(pack, reference);
         }
     }
 

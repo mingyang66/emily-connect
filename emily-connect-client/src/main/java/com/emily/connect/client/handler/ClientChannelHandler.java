@@ -23,6 +23,7 @@ public class ClientChannelHandler extends SimpleChannelInboundHandler<byte[]> {
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, byte[] response) throws Exception {
+        System.out.println("-----------------------channelRead0---------------------接收到响应数据--" + response.length);
         // if (response.packageType == 0) {
         synchronized (this.object) {
             result = response;
@@ -33,10 +34,6 @@ public class ClientChannelHandler extends SimpleChannelInboundHandler<byte[]> {
 
     /**
      * 异常处理
-     *
-     * @param ctx
-     * @param cause
-     * @throws Exception
      */
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {

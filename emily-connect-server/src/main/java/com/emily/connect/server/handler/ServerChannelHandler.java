@@ -2,9 +2,11 @@ package com.emily.connect.server.handler;
 
 import com.emily.connect.core.protocol.RequestHeader;
 import com.emily.connect.core.utils.ByteBufUtils;
+import com.emily.connect.core.utils.MessagePackUtils;
 import com.emily.connect.server.plugin.Plugin;
 import com.emily.connect.server.plugin.PluginRegistry;
 import com.emily.connect.server.plugin.PluginType;
+import com.emily.infrastructure.json.JsonUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -38,6 +40,7 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
      */
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
+        System.out.println("----------------------channelRead----------------------" + ctx.channel().id());
         if (msg == null) {
             return;
         }
@@ -57,18 +60,14 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
                                 .contentType(byteBuf.readByte())
                                 .action(ByteBufUtils.readString(byteBuf));
                         byte[] payload = ByteBufUtils.readBytesByLen(byteBuf);
-                        //System.out.println("请求体：" + ByteBufUtils.readString(byteBuf));
-                        //String str = new String(ByteBufUtils.readBytes(byteBuf), StandardCharsets.UTF_8);
-                        // String str = JsonUtils.toObject(ByteBufUtils.readBytes(byteBuf), String.class);
-                        //String body = MessagePackUtils.deSerialize(ByteBufUtils.readBytes(byteBuf), String.class);
-                        // System.out.println(body + "--反序列化");
-                        //  System.out.println(str);
                         Plugin<?> plugin = switch (header.getContentType()) {
                             case 0 -> PluginRegistry.getPlugin(PluginType.BEAN);
                             case 1 -> PluginRegistry.getPlugin(PluginType.STRING);
                             default -> null;
                         };
                         Object response = plugin.invoke(header, payload);
+                        //发送调用方法调用结果
+                        ctx.writeAndFlush(MessagePackUtils.serialize(JsonUtils.toJSONString(response)));
                     } else if (prefix == 1) {
                         System.out.println("读取心跳消息：");
                         int bodyLength = byteBuf.readInt();

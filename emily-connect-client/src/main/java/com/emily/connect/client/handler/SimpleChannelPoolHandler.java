@@ -29,23 +29,21 @@ public class SimpleChannelPoolHandler extends AbstractChannelPoolHandler {
     @Override
     public void channelAcquired(Channel ch) throws Exception {
         super.channelAcquired(ch);
-        System.out.println("--------------------------------------------------------channelAcquired");
+        System.out.println("--------------------------------------------------------channelAcquired----" + ch.id());
     }
 
     @Override
     public void channelReleased(Channel ch) throws Exception {
+        System.out.println("--------------------------------------------------------channelReleased---" + ch.id());
         super.channelReleased(ch);
-        System.out.println("--------------------------------------------------------channelReleased");
     }
 
     /**
      * 在创建ChannelPool连接池时会调用此方法对Channel进行初始化
-     *
-     * @param ch
-     * @throws Exception
      */
     @Override
     public void channelCreated(Channel ch) throws Exception {
+        System.out.println("---------------------------------------------------------channelCreated----" + ch.id());
         //缓存当前Channel对应的handler
         IO_HANDLER_MAP.put(ch.id(), new ClientChannelHandler());
 
