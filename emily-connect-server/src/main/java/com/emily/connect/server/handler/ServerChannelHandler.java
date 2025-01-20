@@ -49,7 +49,7 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
                         case 1 -> PluginRegistry.getPlugin(PluginType.STRING);
                         default -> null;
                     };
-                    Object response = plugin.invoke(entity.getHeaders(), entity.getBody());
+                    Object response = plugin.invoke(entity.getHeaders(), entity.getPayload());
                     //发送调用方法调用结果
                     ctx.writeAndFlush(response);
                 } else if (prefix == 1) {
@@ -57,7 +57,7 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
                    /* int bodyLength = byteBuf.readInt();
                     byte[] body = new byte[bodyLength];
                     byteBuf.readBytes(body);*/
-                    System.out.println("心跳请求体：" + new String(entity.getBody(), StandardCharsets.UTF_8));
+                 //   System.out.println("心跳请求体：" + new String(entity.getPayload(), StandardCharsets.UTF_8));
                 }
             } else {
                 //todo 非可识别数据类型

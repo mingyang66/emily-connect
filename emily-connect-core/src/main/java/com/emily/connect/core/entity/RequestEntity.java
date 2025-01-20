@@ -7,7 +7,7 @@ package com.emily.connect.core.entity;
 public class RequestEntity {
     private byte prefix;
     private RequestHeader headers;
-    private byte[] body;
+    private RequestPayload[] payload;
 
     public byte getPrefix() {
         return prefix;
@@ -25,12 +25,12 @@ public class RequestEntity {
         this.headers = headers;
     }
 
-    public byte[] getBody() {
-        return body;
+    public RequestPayload[] getPayload() {
+        return payload;
     }
 
-    public void setBody(byte[] body) {
-        this.body = body;
+    public void setPayload(RequestPayload[] payload) {
+        this.payload = payload;
     }
 
     public RequestEntity prefix(byte prefix) {
@@ -43,8 +43,8 @@ public class RequestEntity {
         return this;
     }
 
-    public RequestEntity body(byte[] body) {
-        this.body = body;
+    public RequestEntity payload(RequestPayload...payload) {
+        this.payload = payload;
         return this;
     }
 }

@@ -1,5 +1,6 @@
 package com.emily.connect.server.decoder;
 
+import com.emily.connect.core.entity.RequestPayload;
 import com.emily.connect.core.entity.RequestEntity;
 import com.emily.connect.core.entity.RequestHeader;
 import com.emily.connect.core.utils.ByteBufUtils;
@@ -7,6 +8,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -30,7 +32,16 @@ public class MessagePackDecoder extends ByteToMessageDecoder {
                     .contentType(byteBuf.readByte())
                     .action(ByteBufUtils.readString(byteBuf)));
         }
-        entity.setBody(ByteBufUtils.readBytes(byteBuf));
+        int count = byteBuf.readInt();
+        if (count > 0) {
+            List<RequestPayload> payload = new ArrayList<>();
+            for (int i = 0; i < count; i++) {
+                String name = ByteBufUtils.readString(byteBuf);
+                String value = ByteBufUtils.readString(byteBuf);
+                payload.add(new RequestPayload(name, value));
+            }
+            entity.setPayload(payload.toArray(new RequestPayload[0]));
+        }
         list.add(entity);
     }
 }

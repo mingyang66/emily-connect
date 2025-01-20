@@ -1,5 +1,6 @@
 package com.emily.connect.server.plugin;
 
+import com.emily.connect.core.entity.RequestPayload;
 import com.emily.connect.core.entity.RequestHeader;
 import com.emily.connect.core.entity.ResponseEntity;
 
@@ -10,5 +11,5 @@ import com.emily.connect.core.entity.ResponseEntity;
 public interface Plugin<T> {
     boolean supports(PluginType pluginType);
 
-    ResponseEntity invoke(RequestHeader header, byte[] payload) throws Throwable;
+    ResponseEntity invoke(RequestHeader header, RequestPayload... payload) throws Throwable;
 }

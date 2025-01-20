@@ -16,9 +16,7 @@ public class ByteBufUtils {
     }
 
     public static String readString(ByteBuf byteBuf, Charset charset) {
-        int len = byteBuf.readInt();
-        byte[] b = new byte[len];
-        byteBuf.readBytes(b, 0, len);
+        byte[] b = readBytesByLen(byteBuf);
         return new String(b, charset);
     }
 

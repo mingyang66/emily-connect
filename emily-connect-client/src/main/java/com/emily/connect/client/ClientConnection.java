@@ -2,6 +2,7 @@ package com.emily.connect.client;
 
 import com.emily.connect.client.handler.ClientChannelHandler;
 import com.emily.connect.client.handler.SimpleChannelPoolHandler;
+import com.emily.connect.core.entity.RequestPayload;
 import com.emily.connect.core.entity.RequestEntity;
 import com.emily.connect.core.entity.RequestHeader;
 import com.emily.connect.core.entity.ResponseEntity;
@@ -98,13 +99,12 @@ public class ClientConnection {
      * @param requestHeader 请求头
      * @param payload       请求体
      */
-    public ResponseEntity getForEntity(RequestHeader requestHeader, byte[] payload) throws IOException {
-        RequestEntity entity = new RequestEntity();
-        entity.setPrefix((byte) 0);
-        entity.setHeaders(requestHeader);
-        entity.setBody(payload);
-        ResponseEntity pack = getForObject(entity);
-        return pack;
+    public ResponseEntity getForEntity(RequestHeader requestHeader, RequestPayload... payload) throws IOException {
+        RequestEntity entity = new RequestEntity()
+                .prefix((byte) 0)
+                .headers(requestHeader)
+                .payload(payload);
+        return getForObject(entity);
     }
 
     /**

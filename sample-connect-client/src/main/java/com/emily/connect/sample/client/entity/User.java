@@ -7,7 +7,7 @@ package com.emily.connect.sample.client.entity;
  * @author: Emily
  * @create: 2021/09/17
  */
-public class RequestBody {
+public class User {
 
     /**
      * sql语句唯一标识
