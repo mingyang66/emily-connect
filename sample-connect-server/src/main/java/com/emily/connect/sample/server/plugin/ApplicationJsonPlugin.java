@@ -1,7 +1,7 @@
 package com.emily.connect.sample.server.plugin;
 
-import com.emily.connect.core.entity.RequestPayload;
 import com.emily.connect.core.entity.RequestHeader;
+import com.emily.connect.core.entity.RequestPayload;
 import com.emily.connect.core.entity.ResponseEntity;
 import com.emily.connect.server.plugin.Plugin;
 import com.emily.connect.server.plugin.PluginType;
@@ -36,6 +36,34 @@ public class ApplicationJsonPlugin implements Plugin<String> {
 
     public ApplicationJsonPlugin(RequestMappingHandlerMapping handlerMapping) {
         this.handlerMapping = handlerMapping;
+    }
+
+    public static boolean isEntityClass(Class<?> clazz) {
+        // 检查类是否包含至少一个字段
+        Field[] fields = clazz.getDeclaredFields();
+        if (fields.length == 0) {
+            return false;
+        }
+
+        // 检查类是否包含至少一个方法
+        Method[] methods = clazz.getDeclaredMethods();
+        if (methods.length == 0) {
+            return false;
+        }
+
+        // 进一步检查方法是否包含 getter 和 setter
+        boolean hasGetter = false;
+        boolean hasSetter = false;
+        for (Method method : methods) {
+            if (method.getName().startsWith("get") && method.getParameterCount() == 0) {
+                hasGetter = true;
+            }
+            if (method.getName().startsWith("set") && method.getParameterCount() == 1) {
+                hasSetter = true;
+            }
+        }
+
+        return hasGetter && hasSetter;
     }
 
     @Override
@@ -92,33 +120,5 @@ public class ApplicationJsonPlugin implements Plugin<String> {
             return entity.status(0).message("success").data(result);
         }
         return entity.status(10000).message("请求接口不存在");
-    }
-
-    public static boolean isEntityClass(Class<?> clazz) {
-        // 检查类是否包含至少一个字段
-        Field[] fields = clazz.getDeclaredFields();
-        if (fields.length == 0) {
-            return false;
-        }
-
-        // 检查类是否包含至少一个方法
-        Method[] methods = clazz.getDeclaredMethods();
-        if (methods.length == 0) {
-            return false;
-        }
-
-        // 进一步检查方法是否包含 getter 和 setter
-        boolean hasGetter = false;
-        boolean hasSetter = false;
-        for (Method method : methods) {
-            if (method.getName().startsWith("get") && method.getParameterCount() == 0) {
-                hasGetter = true;
-            }
-            if (method.getName().startsWith("set") && method.getParameterCount() == 1) {
-                hasSetter = true;
-            }
-        }
-
-        return hasGetter && hasSetter;
     }
 }

@@ -5,20 +5,11 @@ package com.emily.connect.core.entity;
  * @since :  2025/1/20 下午3:01
  */
 public class RequestPayload {
-    private String name;
+
     private String value;
 
-    public RequestPayload(String name, String value) {
-        this.name = name;
+    public RequestPayload(String value) {
         this.value = value;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getValue() {

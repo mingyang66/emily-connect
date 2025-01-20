@@ -2,9 +2,9 @@ package com.emily.connect.client;
 
 import com.emily.connect.client.handler.ClientChannelHandler;
 import com.emily.connect.client.handler.SimpleChannelPoolHandler;
-import com.emily.connect.core.entity.RequestPayload;
 import com.emily.connect.core.entity.RequestEntity;
 import com.emily.connect.core.entity.RequestHeader;
+import com.emily.connect.core.entity.RequestPayload;
 import com.emily.connect.core.entity.ResponseEntity;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;

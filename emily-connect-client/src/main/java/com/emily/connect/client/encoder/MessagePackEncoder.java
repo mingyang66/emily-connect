@@ -1,7 +1,7 @@
 package com.emily.connect.client.encoder;
 
-import com.emily.connect.core.entity.RequestPayload;
 import com.emily.connect.core.entity.RequestEntity;
+import com.emily.connect.core.entity.RequestPayload;
 import com.emily.connect.core.utils.ByteBufUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -25,7 +25,6 @@ public class MessagePackEncoder extends MessageToByteEncoder<RequestEntity> {
         if (payload != null) {
             byteBuf.writeInt(payload.length);
             for (RequestPayload body : payload) {
-                ByteBufUtils.writeString(byteBuf, body.getName());
                 ByteBufUtils.writeString(byteBuf, body.getValue());
             }
         }

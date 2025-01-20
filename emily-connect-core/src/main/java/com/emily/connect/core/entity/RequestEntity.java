@@ -43,7 +43,7 @@ public class RequestEntity {
         return this;
     }
 
-    public RequestEntity payload(RequestPayload...payload) {
+    public RequestEntity payload(RequestPayload... payload) {
         this.payload = payload;
         return this;
     }

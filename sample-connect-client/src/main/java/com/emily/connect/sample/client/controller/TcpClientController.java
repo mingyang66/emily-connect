@@ -2,8 +2,8 @@ package com.emily.connect.sample.client.controller;
 
 import com.emily.connect.client.ClientConnection;
 import com.emily.connect.client.ClientProperties;
-import com.emily.connect.core.entity.RequestPayload;
 import com.emily.connect.core.entity.RequestHeader;
+import com.emily.connect.core.entity.RequestPayload;
 import com.emily.connect.core.entity.ResponseEntity;
 import com.emily.connect.core.utils.UUIDUtils;
 import com.emily.connect.sample.client.entity.User;
@@ -35,7 +35,7 @@ public class TcpClientController {
                 .systemNumber("Emily-Sdk")
                 .contentType((byte) 0)
                 .action("/api/user/getUser");
-        ResponseEntity entity = connection.getForEntity(requestHeader, new RequestPayload("user", JsonUtils.toJSONString(user)));
+        ResponseEntity entity = connection.getForEntity(requestHeader, new RequestPayload(JsonUtils.toJSONString(user)));
         return entity.getData();
     }
 }

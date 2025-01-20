@@ -24,7 +24,7 @@ public class HeartBeatChannelHandler extends ChannelInboundHandlerAdapter {
                         byte[] hearBeat = "hearBeat...".getBytes(StandardCharsets.UTF_8);
                         RequestEntity entity = new RequestEntity();
                         entity.setPrefix((byte) 1);
-                       // entity.setBody(hearBeat);
+                        // entity.setBody(hearBeat);
                         // 创建一个ByteBuf实例
 //                        ByteBuf byteBuf = Unpooled.buffer();
 //                        // 向ByteBuf中写入数据
