@@ -13,7 +13,7 @@ import io.netty.handler.codec.MessageToByteEncoder;
  * @author: Emily
  * @create: 2021/09/23
  */
-public class MessagePackEncoder extends MessageToByteEncoder<ResponseEntity> {
+public class ServerMessagePackEncoder extends MessageToByteEncoder<ResponseEntity> {
 
     @Override
     protected void encode(ChannelHandlerContext ctx, ResponseEntity entity, ByteBuf byteBuf) {

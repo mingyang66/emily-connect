@@ -1,7 +1,7 @@
 package com.emily.connect.client.handler;
 
-import com.emily.connect.client.decoder.MessagePackDecoder;
-import com.emily.connect.client.encoder.MessagePackEncoder;
+import com.emily.connect.client.decoder.ClientMessagePackDecoder;
+import com.emily.connect.client.encoder.ClientMessagePackEncoder;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelId;
 import io.netty.channel.ChannelPipeline;
@@ -62,7 +62,7 @@ public class PoolClientChannelHandler extends AbstractChannelPoolHandler {
          */
         pipeline.addLast(new LengthFieldBasedFrameDecoder(ByteOrder.BIG_ENDIAN, 65535, 0, 2, 0, 2, true));
         //自定义解码器
-        pipeline.addLast(new MessagePackDecoder());
+        pipeline.addLast(new ClientMessagePackDecoder());
         /**
          * 在消息前面加上前缀的编码器（只能是1、2、3、4、8，默认不包含长度字段的长度）
          * byteOrder:表示Length字段本身占用的字节数使用的是大端还是小端编码
@@ -78,7 +78,7 @@ public class PoolClientChannelHandler extends AbstractChannelPoolHandler {
          */
         pipeline.addLast(new LengthFieldPrepender(ByteOrder.BIG_ENDIAN, 2, 0, false));
         //自定义编码器
-        pipeline.addLast(new MessagePackEncoder());
+        pipeline.addLast(new ClientMessagePackEncoder());
         //自定义handler处理
         pipeline.addLast(POOL_CHANNEL_HANDLER.get(ch.id()));
         //空闲状态处理器，参数说明：读时间空闲时间，0禁用时间|写事件空闲时间，0则禁用|读或写空闲时间，0则禁用

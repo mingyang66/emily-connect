@@ -1,7 +1,7 @@
 package com.emily.connect.server;
 
-import com.emily.connect.server.decoder.MessagePackDecoder;
-import com.emily.connect.server.encoder.MessagePackEncoder;
+import com.emily.connect.server.decoder.ServerMessagePackDecoder;
+import com.emily.connect.server.encoder.ServerMessagePackEncoder;
 import com.emily.connect.server.handler.ServerChannelHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
@@ -92,7 +92,7 @@ public class ServerConnection {
                              */
                             pipeline.addLast(new LengthFieldBasedFrameDecoder(ByteOrder.BIG_ENDIAN, 65535, 0, 2, 0, 2, true));
                             //自定义解码器
-                            pipeline.addLast(new MessagePackDecoder());
+                            pipeline.addLast(new ServerMessagePackDecoder());
                             /**
                              * 在消息前面加上前缀的编码器（只能是1、2、3、4、8，默认不包含长度字段的长度）
                              * byteOrder:表示Length字段本身占用的字节数使用的是大端还是小端编码
@@ -108,7 +108,7 @@ public class ServerConnection {
                              */
                             pipeline.addLast(new LengthFieldPrepender(ByteOrder.BIG_ENDIAN, 2, 0, false));
                             //自定义编码器
-                            pipeline.addLast(new MessagePackEncoder());
+                            pipeline.addLast(new ServerMessagePackEncoder());
                             //自定义处理器
                             pipeline.addLast(new ServerChannelHandler());
                         }
