@@ -39,7 +39,7 @@ public class ClientChannelHandler extends SimpleChannelInboundHandler<ResponseEn
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         System.out.println(cause.getMessage());
-        if (ctx.channel().id() != null && SimpleChannelPoolHandler.CHANNEL_HANDLER_POOL.containsKey(ctx.channel().id())) {
+        if (ctx.channel().id() != null) {
             SimpleChannelPoolHandler.CHANNEL_HANDLER_POOL.remove(ctx.channel().id());
         }
         ctx.close();
