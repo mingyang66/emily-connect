@@ -2,8 +2,7 @@ package com.emily.connect.client;
 
 
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.List;
+import java.util.Map;
 
 /**
  * @program: SkyDb
@@ -15,11 +14,11 @@ public class ClientProperties {
     /**
      * 服务器地址，支持集群配置
      */
-    private List<Address> address = Arrays.asList(new Address(), new Address("172.30.71.95", 9999));
+    private Map<String, String> config;
     /**
-     * 请求超时时间，默认：5秒
+     * 请求超时时间，默认：60秒
      */
-    private Duration readTimeOut = Duration.ofSeconds(5);
+    private Duration readTimeOut = Duration.ofSeconds(60);
     /**
      * 连接超时时间，默认：5秒
      */
@@ -33,12 +32,12 @@ public class ClientProperties {
      */
     private int maxConnections = 5;
 
-    public List<Address> getAddress() {
-        return address;
+    public Map<String, String> getConfig() {
+        return config;
     }
 
-    public void setAddress(List<Address> address) {
-        this.address = address;
+    public void setConfig(Map<String, String> config) {
+        this.config = config;
     }
 
     public Duration getReadTimeOut() {
@@ -71,40 +70,5 @@ public class ClientProperties {
 
     public void setMaxConnections(int maxConnections) {
         this.maxConnections = maxConnections;
-    }
-
-    public static class Address {
-        /**
-         * ip地址，默认：127.0.0.1
-         */
-        private String ip = "127.0.0.1";
-        /**
-         * 端口号 默认：9999
-         */
-        private int port = 9999;
-
-        public Address() {
-        }
-
-        public Address(String ip, int port) {
-            this.ip = ip;
-            this.port = port;
-        }
-
-        public String getIp() {
-            return ip;
-        }
-
-        public void setIp(String ip) {
-            this.ip = ip;
-        }
-
-        public int getPort() {
-            return port;
-        }
-
-        public void setPort(int port) {
-            this.port = port;
-        }
     }
 }

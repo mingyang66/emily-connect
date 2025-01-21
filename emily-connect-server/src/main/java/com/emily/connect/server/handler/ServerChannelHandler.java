@@ -52,10 +52,6 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
                     ctx.writeAndFlush(response);
                 } else if (prefix == 1) {
                     System.out.println("读取心跳消息：");
-                   /* int bodyLength = byteBuf.readInt();
-                    byte[] body = new byte[bodyLength];
-                    byteBuf.readBytes(body);*/
-                    //   System.out.println("心跳请求体：" + new String(entity.getPayload(), StandardCharsets.UTF_8));
                 }
             } else {
                 //todo 非可识别数据类型

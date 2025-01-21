@@ -99,25 +99,27 @@ public class ClientConnection {
      * @param requestHeader 请求头
      * @param payload       请求体
      */
-    public ResponseEntity getForEntity(RequestHeader requestHeader, RequestPayload... payload) throws IOException {
+    public ResponseEntity getForEntity(String tag, RequestHeader requestHeader, RequestPayload... payload) {
+        ChannelPool pool = getChannelPool(this.getSocketAddress(tag));
         RequestEntity entity = new RequestEntity()
                 .prefix((byte) 0)
                 .headers(requestHeader)
                 .payload(payload);
-        return getForObject(entity);
+        return getForObject(pool, entity);
     }
 
     /**
      * 发送请求
      */
-    public ResponseEntity getForObject(RequestEntity entity) {
+    public ResponseEntity getForObject(ChannelPool pool, RequestEntity entity) {
+        Objects.requireNonNull(pool, "ChannelPool can not be null");
+        Objects.requireNonNull(entity, "RequestEntity can not be null");
         ResponseEntity response = null;
-        ChannelPool pool = getChannelPool(new InetSocketAddress("127.0.0.1", 9999));
         Channel channel = null;
         ClientChannelHandler ioHandler = null;
         try {
             //从ChannelPool中获取一个Channel
-            final Future<Channel> future = pool.acquire();
+            Future<Channel> future = pool.acquire();
             //等待future完成
             future.await();
             //判定I/O操作是否成功完成
@@ -152,7 +154,7 @@ public class ClientConnection {
         } catch (Exception exception) {
             //todo
         } finally {
-            if (Objects.nonNull(pool) && Objects.nonNull(channel)) {
+            if (Objects.nonNull(channel)) {
                 pool.release(channel);
             }
             if (Objects.nonNull(ioHandler)) {
@@ -160,5 +162,19 @@ public class ClientConnection {
             }
         }
         return response;
+    }
+
+    public ClientProperties getProperties() {
+        return properties;
+    }
+
+    public InetSocketAddress getSocketAddress(String tag) {
+        String address = this.getProperties().getConfig().get(tag);
+        if (address == null) {
+            throw new IllegalStateException("Server address can not be config");
+        }
+        String host = address.split(":")[0];
+        String port = address.split(":")[1];
+        return new InetSocketAddress(host, Integer.parseInt(port));
     }
 }
