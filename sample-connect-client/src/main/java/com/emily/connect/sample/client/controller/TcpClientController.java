@@ -1,6 +1,5 @@
 package com.emily.connect.sample.client.controller;
 
-import com.emily.connect.client.ClientConnection;
 import com.emily.connect.client.ClientManager;
 import com.emily.connect.core.entity.RequestHeader;
 import com.emily.connect.core.entity.RequestPayload;

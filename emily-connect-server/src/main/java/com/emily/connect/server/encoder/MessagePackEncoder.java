@@ -17,19 +17,23 @@ public class MessagePackEncoder extends MessageToByteEncoder<ResponseEntity> {
 
     @Override
     protected void encode(ChannelHandlerContext ctx, ResponseEntity entity, ByteBuf byteBuf) {
-        byteBuf.writeByte(entity.getPrefix());
-        byteBuf.writeInt(entity.getStatus());
-        ByteBufUtils.writeString(byteBuf, entity.getMessage());
-        Object data = entity.getData();
-        if (data == null) {
-            return;
-        }
-        if (data instanceof byte[] bytes) {
-            byteBuf.writeBytes(bytes);
-        } else if (data instanceof String str) {
-            ByteBufUtils.writeString(byteBuf, str);
-        } else {
-            ByteBufUtils.writeString(byteBuf, JsonUtils.toJSONString(data));
+        if (entity.getPrefix() == 0) {
+            byteBuf.writeByte(entity.getPrefix());
+            byteBuf.writeInt(entity.getStatus());
+            ByteBufUtils.writeString(byteBuf, entity.getMessage());
+            Object data = entity.getData();
+            if (data == null) {
+                return;
+            }
+            if (data instanceof byte[] bytes) {
+                byteBuf.writeBytes(bytes);
+            } else if (data instanceof String str) {
+                ByteBufUtils.writeString(byteBuf, str);
+            } else {
+                ByteBufUtils.writeString(byteBuf, JsonUtils.toJSONString(data));
+            }
+        } else if (entity.getPrefix() == 1) {
+            byteBuf.writeByte(entity.getPrefix());
         }
     }
 }

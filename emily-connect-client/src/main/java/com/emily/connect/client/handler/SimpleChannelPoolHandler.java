@@ -12,6 +12,8 @@ import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.internal.PlatformDependent;
 
 import java.nio.ByteOrder;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -29,12 +31,12 @@ public class SimpleChannelPoolHandler extends AbstractChannelPoolHandler {
     @Override
     public void channelAcquired(Channel ch) throws Exception {
         super.channelAcquired(ch);
-        System.out.println("--------------------------------------------------------channelAcquired----" + ch.id());
+        System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + " channelAcquired：" + ch.id());
     }
 
     @Override
     public void channelReleased(Channel ch) throws Exception {
-        System.out.println("--------------------------------------------------------channelReleased---" + ch.id());
+        System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + " channelReleased：" + ch.id());
         super.channelReleased(ch);
     }
 
@@ -43,7 +45,7 @@ public class SimpleChannelPoolHandler extends AbstractChannelPoolHandler {
      */
     @Override
     public void channelCreated(Channel ch) throws Exception {
-        System.out.println("---------------------------------------------------------channelCreated----" + ch.id());
+        System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + " channelCreated：" + ch.id());
         //缓存当前Channel对应的handler
         CHANNEL_HANDLER_POOL.putIfAbsent(ch.id(), new ClientChannelHandler());
 

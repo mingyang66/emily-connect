@@ -17,16 +17,18 @@ public class MessagePackEncoder extends MessageToByteEncoder<RequestEntity> {
 
     @Override
     protected void encode(ChannelHandlerContext ctx, RequestEntity entity, ByteBuf byteBuf) {
-        byteBuf.writeByte(entity.getPrefix());
         if (entity.getPrefix() == 0) {
+            byteBuf.writeByte(entity.getPrefix());
             byteBuf.writeBytes(entity.getHeaders().toByteArray());
-        }
-        RequestPayload[] payload = entity.getPayload();
-        if (payload != null) {
-            byteBuf.writeInt(payload.length);
-            for (RequestPayload body : payload) {
-                ByteBufUtils.writeString(byteBuf, body.getValue());
+            RequestPayload[] payload = entity.getPayload();
+            if (payload != null) {
+                byteBuf.writeInt(payload.length);
+                for (RequestPayload body : payload) {
+                    ByteBufUtils.writeString(byteBuf, body.getValue());
+                }
             }
+        } else if (entity.getPrefix() == 1) {
+            byteBuf.writeByte(entity.getPrefix());
         }
     }
 }

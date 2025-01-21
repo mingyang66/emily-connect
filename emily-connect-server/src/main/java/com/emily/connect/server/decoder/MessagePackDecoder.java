@@ -22,8 +22,9 @@ public class MessagePackDecoder extends ByteToMessageDecoder {
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> list) {
         RequestEntity entity = new RequestEntity();
-        entity.setPrefix(byteBuf.readByte());
-        if (entity.getPrefix() == 0) {
+        byte prefix = byteBuf.readByte();
+        if (prefix == 0) {
+            entity.setPrefix(prefix);
             entity.setHeaders(new RequestHeader()
                     .systemNumber(ByteBufUtils.readString(byteBuf))
                     .traceId(ByteBufUtils.readString(byteBuf))
@@ -32,15 +33,17 @@ public class MessagePackDecoder extends ByteToMessageDecoder {
                     .contentType(byteBuf.readByte())
                     .action(ByteBufUtils.readString(byteBuf))
                     .method(ByteBufUtils.readString(byteBuf)));
-        }
-        int count = byteBuf.readInt();
-        if (count > 0) {
-            List<RequestPayload> payload = new ArrayList<>();
-            for (int i = 0; i < count; i++) {
-                String value = ByteBufUtils.readString(byteBuf);
-                payload.add(new RequestPayload(value));
+            int count = byteBuf.readInt();
+            if (count > 0) {
+                List<RequestPayload> payload = new ArrayList<>();
+                for (int i = 0; i < count; i++) {
+                    String value = ByteBufUtils.readString(byteBuf);
+                    payload.add(new RequestPayload(value));
+                }
+                entity.setPayload(payload.toArray(new RequestPayload[0]));
             }
-            entity.setPayload(payload.toArray(new RequestPayload[0]));
+        } else if (prefix == 1) {
+            entity.setPrefix(prefix);
         }
         list.add(entity);
     }

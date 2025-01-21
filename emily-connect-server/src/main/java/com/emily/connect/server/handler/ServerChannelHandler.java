@@ -1,12 +1,16 @@
 package com.emily.connect.server.handler;
 
 import com.emily.connect.core.entity.RequestEntity;
+import com.emily.connect.core.entity.ResponseEntity;
 import com.emily.connect.server.plugin.Plugin;
 import com.emily.connect.server.plugin.PluginRegistry;
 import com.emily.connect.server.plugin.PluginType;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.ReferenceCountUtil;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * @program: SkyDb
@@ -19,13 +23,13 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         super.channelActive(ctx);
-        System.out.println("Rpc客户端连接成功：" + ctx.channel().remoteAddress());
+        System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + " Tpc客户端连接成功channelActive：" + ctx.channel().remoteAddress());
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         ctx.channel().close();
-        System.out.println("Rpc服务器连接断开：" + ctx.channel().remoteAddress());
+        System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + " Tpc服务器连接断开channelInactive：" + ctx.channel().remoteAddress());
     }
 
     /**
@@ -33,7 +37,7 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
      */
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
-        System.out.println("----------------------channelRead----------------------" + ctx.channel().id());
+        System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + " Tcp服务器读取到客户端数据channelRead：" + ctx.channel().remoteAddress());
         if (msg == null) {
             return;
         }
@@ -51,14 +55,15 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
                     //发送调用方法调用结果
                     ctx.writeAndFlush(response);
                 } else if (prefix == 1) {
-                    System.out.println("读取心跳消息：");
+                    System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + ":收到 " + ctx.channel().remoteAddress() + " 心跳包");
+                    ctx.writeAndFlush(new ResponseEntity().prefix((byte) 1));
                 }
             } else {
                 //todo 非可识别数据类型
-                System.out.println("----非可识别数据类型----");
+                System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + ":不可识别处理数据");
             }
         } catch (Throwable exception) {
-            exception.printStackTrace();
+            System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + ":收到消息解析异常" + exception.getMessage());
         } finally {
             //手动释放消息，否则会导致内存泄漏
             ReferenceCountUtil.release(msg);
@@ -68,6 +73,7 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + " Tcp服务器端异常exceptionCaught：" + ctx.channel().remoteAddress() + ": " + cause.getMessage());
         ctx.close();
     }
 }

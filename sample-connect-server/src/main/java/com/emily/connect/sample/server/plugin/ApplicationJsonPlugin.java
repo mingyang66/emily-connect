@@ -64,6 +64,46 @@ public class ApplicationJsonPlugin implements Plugin<String> {
         return hasGetter && hasSetter;
     }
 
+    // 检查类型是否是原始类型或包装类型
+    public static boolean isWrapper(Class<?> type) {
+        if (Byte.class.isAssignableFrom(type)) {
+            return true;
+        } else if (Short.class.isAssignableFrom(type)) {
+            return true;
+        } else if (Integer.class.isAssignableFrom(type)) {
+            return true;
+        } else if (Long.class.isAssignableFrom(type)) {
+            return true;
+        } else if (Float.class.isAssignableFrom(type)) {
+            return true;
+        } else if (Double.class.isAssignableFrom(type)) {
+            return true;
+        } else if (Boolean.class.isAssignableFrom(type)) {
+            return true;
+        } else return Character.class.isAssignableFrom(type);
+    }
+
+    public static Object toPrimitive(String value, Class<?> type) {
+        if (type == byte.class) {
+            return StringUtils.isBlank(value) ? (byte) 0 : Byte.parseByte(value);
+        } else if (type == short.class) {
+            return StringUtils.isBlank(value) ? (short) 0 : Short.parseShort(value);
+        } else if (type == int.class) {
+            return StringUtils.isBlank(value) ? 0 : Integer.parseInt(value);
+        } else if (type == long.class) {
+            return StringUtils.isBlank(value) ? 0L : Long.parseLong(value);
+        } else if (type == float.class) {
+            return StringUtils.isBlank(value) ? 0.0f : Float.parseFloat(value);
+        } else if (type == double.class) {
+            return StringUtils.isBlank(value) ? 0.0d : Double.parseDouble(value);
+        } else if (type == char.class) {
+            return StringUtils.isBlank(value) ? "\\u0000" : value.charAt(0);
+        } else if (type == boolean.class) {
+            return !StringUtils.isBlank(value) && Boolean.parseBoolean(value);
+        }
+        throw new IllegalArgumentException("Unsupported Parameter Type：" + type.getName());
+    }
+
     @Override
     public boolean supports(PluginType pluginType) {
         return pluginType == PluginType.BEAN;
@@ -125,46 +165,5 @@ public class ApplicationJsonPlugin implements Plugin<String> {
             return entity.status(0).message("success").data(result);
         }
         return entity.status(10000).message("请求接口不存在");
-    }
-
-
-    // 检查类型是否是原始类型或包装类型
-    public static boolean isWrapper(Class<?> type) {
-        if (Byte.class.isAssignableFrom(type)) {
-            return true;
-        } else if (Short.class.isAssignableFrom(type)) {
-            return true;
-        } else if (Integer.class.isAssignableFrom(type)) {
-            return true;
-        } else if (Long.class.isAssignableFrom(type)) {
-            return true;
-        } else if (Float.class.isAssignableFrom(type)) {
-            return true;
-        } else if (Double.class.isAssignableFrom(type)) {
-            return true;
-        } else if (Boolean.class.isAssignableFrom(type)) {
-            return true;
-        } else return Character.class.isAssignableFrom(type);
-    }
-
-    public static Object toPrimitive(String value, Class<?> type) {
-        if (type == byte.class) {
-            return StringUtils.isBlank(value) ? (byte) 0 : Byte.parseByte(value);
-        } else if (type == short.class) {
-            return StringUtils.isBlank(value) ? (short) 0 : Short.parseShort(value);
-        } else if (type == int.class) {
-            return StringUtils.isBlank(value) ? 0 : Integer.parseInt(value);
-        } else if (type == long.class) {
-            return StringUtils.isBlank(value) ? 0L : Long.parseLong(value);
-        } else if (type == float.class) {
-            return StringUtils.isBlank(value) ? 0.0f : Float.parseFloat(value);
-        } else if (type == double.class) {
-            return StringUtils.isBlank(value) ? 0.0d : Double.parseDouble(value);
-        } else if (type == char.class) {
-            return StringUtils.isBlank(value) ? "\\u0000" : value.charAt(0);
-        } else if (type == boolean.class) {
-            return !StringUtils.isBlank(value) && Boolean.parseBoolean(value);
-        }
-        throw new IllegalArgumentException("Unsupported Parameter Type：" + type.getName());
     }
 }

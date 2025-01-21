@@ -18,12 +18,16 @@ public class MessagePackDecoder extends ByteToMessageDecoder {
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> list) {
-        ResponseEntity entity = new ResponseEntity()
-                .prefix(byteBuf.readByte())
-                .status(byteBuf.readInt())
-                .message(ByteBufUtils.readString(byteBuf))
-                .data(ByteBufUtils.readString(byteBuf));
-
+        ResponseEntity entity = new ResponseEntity();
+        byte prefix = byteBuf.readByte();
+        if (prefix == 0) {
+            entity.prefix(prefix)
+                    .status(byteBuf.readInt())
+                    .message(ByteBufUtils.readString(byteBuf))
+                    .data(ByteBufUtils.readString(byteBuf));
+        } else if (prefix == 1) {
+            entity.prefix(prefix);
+        }
         list.add(entity);
     }
 }

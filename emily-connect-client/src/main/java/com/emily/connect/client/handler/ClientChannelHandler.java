@@ -4,6 +4,9 @@ import com.emily.connect.core.entity.ResponseEntity;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 /**
  * @program: SkyDb
  * @description: 由于需要在 handler 中发送消息给服务端，并且将服务端返回的消息读取后返回给消费者,所以实现了 Callable 接口，这样可以运行有返回值的线程
@@ -19,12 +22,12 @@ public class ClientChannelHandler extends SimpleChannelInboundHandler<ResponseEn
     public ResponseEntity result;
 
     public ClientChannelHandler() {
-        System.out.println("新建handler------------DbClientChannelHandler");
+        System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + " 新建handler------------DbClientChannelHandler");
     }
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ResponseEntity response) throws Exception {
-        System.out.println("-----------------------channelRead0---------------------接收到响应数据--" + response.getMessage());
+        System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + " 接收到响应数据channelRead0：" + response.getMessage());
         if (response.getPrefix() == 0) {
             synchronized (this.object) {
                 result = response;
@@ -38,7 +41,7 @@ public class ClientChannelHandler extends SimpleChannelInboundHandler<ResponseEn
      */
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        System.out.println(cause.getMessage());
+        System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + cause.getMessage());
         if (ctx.channel().id() != null) {
             SimpleChannelPoolHandler.CHANNEL_HANDLER_POOL.remove(ctx.channel().id());
         }
