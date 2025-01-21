@@ -20,9 +20,9 @@ public class TestController {
         return user;
     }
 
-    @GetMapping("/hello")
+    @GetMapping("api/user/hello")
     @ResponseBody
-    public String hello(@RequestParam String name) {
+    public String hello(@RequestParam String name, Integer height, double line) {
         return "Hello, " + name;
     }
 

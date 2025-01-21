@@ -30,7 +30,8 @@ public class MessagePackDecoder extends ByteToMessageDecoder {
                     .appType(ByteBufUtils.readString(byteBuf))
                     .appVersion(ByteBufUtils.readString(byteBuf))
                     .contentType(byteBuf.readByte())
-                    .action(ByteBufUtils.readString(byteBuf)));
+                    .action(ByteBufUtils.readString(byteBuf))
+                    .method(ByteBufUtils.readString(byteBuf)));
         }
         int count = byteBuf.readInt();
         if (count > 0) {

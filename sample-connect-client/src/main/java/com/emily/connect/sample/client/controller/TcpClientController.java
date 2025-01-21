@@ -34,8 +34,28 @@ public class TcpClientController {
                 .appVersion("6.8")
                 .systemNumber("Emily-Sdk")
                 .contentType((byte) 0)
-                .action("/api/user/getUser");
+                .action("/api/user/getUser")
+                .method("POST");
         ResponseEntity entity = connection.getForEntity(requestHeader, new RequestPayload(JsonUtils.toJSONString(user)));
+        return entity.getData();
+    }
+
+    @GetMapping("api/tcp/hello")
+    public Object getHello() throws IOException {
+        User user = new User();
+        user.setUsername("account");
+        user.setPassword("select_test_dual");
+        user.setAge(10);
+
+        RequestHeader requestHeader = new RequestHeader()
+                .traceId(UUIDUtils.randomSimpleUUID())
+                .appType("com.android")
+                .appVersion("6.8")
+                .systemNumber("Emily-Sdk")
+                .contentType((byte) 0)
+                .action("/api/user/hello")
+                .method("get");
+        ResponseEntity entity = connection.getForEntity(requestHeader, new RequestPayload("田晓霞"), new RequestPayload("18"), new RequestPayload("2.3"));
         return entity.getData();
     }
 }
