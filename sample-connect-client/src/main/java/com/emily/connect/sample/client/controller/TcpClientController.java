@@ -19,7 +19,6 @@ import java.io.IOException;
  */
 @RestController
 public class TcpClientController {
-    private static final ClientConnection connection = ClientManager.getConnection();
 
     @GetMapping("api/tcp/client")
     public Object getObj() throws IOException {
@@ -36,7 +35,7 @@ public class TcpClientController {
                 .contentType((byte) 0)
                 .action("/api/user/getUser")
                 .method("POST");
-        ResponseEntity entity = connection.getForEntity("test", requestHeader, new RequestPayload(JsonUtils.toJSONString(user)));
+        ResponseEntity entity = ClientManager.getConnection().getForEntity("test", requestHeader, new RequestPayload(JsonUtils.toJSONString(user)));
         return entity.getData();
     }
 
@@ -55,7 +54,7 @@ public class TcpClientController {
                 .contentType((byte) 0)
                 .action("/api/user/hello")
                 .method("get");
-        ResponseEntity entity = connection.getForEntity("test", requestHeader, new RequestPayload("田晓霞"), new RequestPayload("18"), new RequestPayload("2.3"));
+        ResponseEntity entity = ClientManager.getConnection().getForEntity("test", requestHeader, new RequestPayload("田晓霞"), new RequestPayload("18"), new RequestPayload("2.3"));
         return entity.getData();
     }
 }

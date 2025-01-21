@@ -19,9 +19,10 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.concurrent.Future;
 import org.apache.commons.lang3.math.NumberUtils;
 
-import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.Objects;
+
+import static com.emily.connect.client.handler.SimpleChannelPoolHandler.CHANNEL_HANDLER_POOL;
 
 /**
  * @program: SkyDb
@@ -100,23 +101,25 @@ public class ClientConnection {
      * @param payload       请求体
      */
     public ResponseEntity getForEntity(String tag, RequestHeader requestHeader, RequestPayload... payload) {
+        Objects.requireNonNull(tag, "tag can not be null");
+        Objects.requireNonNull(tag, "requestHeader can not be null");
         ChannelPool pool = getChannelPool(this.getSocketAddress(tag));
         RequestEntity entity = new RequestEntity()
                 .prefix((byte) 0)
                 .headers(requestHeader)
                 .payload(payload);
-        return getForObject(pool, entity);
+        return getForEntity(pool, entity);
     }
 
     /**
      * 发送请求
      */
-    public ResponseEntity getForObject(ChannelPool pool, RequestEntity entity) {
+    public ResponseEntity getForEntity(ChannelPool pool, RequestEntity entity) {
         Objects.requireNonNull(pool, "ChannelPool can not be null");
         Objects.requireNonNull(entity, "RequestEntity can not be null");
-        ResponseEntity response = null;
+        ResponseEntity response;
         Channel channel = null;
-        ClientChannelHandler ioHandler = null;
+        ClientChannelHandler channelHandler = null;
         try {
             //从ChannelPool中获取一个Channel
             Future<Channel> future = pool.acquire();
@@ -128,37 +131,33 @@ public class ClientConnection {
                 channel = future.getNow();
                 if (channel != null && channel.isActive() && channel.isWritable()) {
                     //获取信道对应的handler对象
-                    ioHandler = SimpleChannelPoolHandler.IO_HANDLER_MAP.get(channel.id());
-                    if (ioHandler != null) {
-                        synchronized (ioHandler.object) {
+                    channelHandler = CHANNEL_HANDLER_POOL.get(channel.id());
+                    if (channelHandler != null) {
+                        synchronized (channelHandler.object) {
                             //发送TCP请求
                             channel.writeAndFlush(entity);
                             //等待请求返回结果
-                            ioHandler.object.wait(this.properties.getReadTimeOut().toMillis());
+                            channelHandler.object.wait(this.properties.getReadTimeOut().toMillis());
                         }
                         //根据返回结果做后续处理
-                        if (ioHandler.result == null) {
-                            //todo
-                        } else {
-                            response = ioHandler.result;
-                        }
+                        response = channelHandler.result;
                     } else {
-                        //todo
+                        throw new IllegalAccessException("The Channel processor handler is empty");
                     }
                 } else {
-                    //todo
+                    throw new IllegalAccessException("Channel unavailable");
                 }
             } else {
-                //todo
+                throw new IllegalAccessException("Get Channel is Fail");
             }
-        } catch (Exception exception) {
-            //todo
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         } finally {
             if (Objects.nonNull(channel)) {
                 pool.release(channel);
             }
-            if (Objects.nonNull(ioHandler)) {
-                ioHandler.result = null;
+            if (Objects.nonNull(channelHandler)) {
+                channelHandler.result = null;
             }
         }
         return response;

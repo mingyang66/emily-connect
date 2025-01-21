@@ -25,11 +25,11 @@ public class ClientChannelHandler extends SimpleChannelInboundHandler<ResponseEn
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ResponseEntity response) throws Exception {
         System.out.println("-----------------------channelRead0---------------------接收到响应数据--" + response.getMessage());
-        // if (response.packageType == 0) {
-        synchronized (this.object) {
-            result = response;
-            this.object.notify();
-            //    }
+        if (response.getPrefix() == 0) {
+            synchronized (this.object) {
+                result = response;
+                this.object.notify();
+            }
         }
     }
 
@@ -39,8 +39,8 @@ public class ClientChannelHandler extends SimpleChannelInboundHandler<ResponseEn
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         System.out.println(cause.getMessage());
-        if (ctx.channel().id() != null && SimpleChannelPoolHandler.IO_HANDLER_MAP.containsKey(ctx.channel().id())) {
-            SimpleChannelPoolHandler.IO_HANDLER_MAP.remove(ctx.channel().id());
+        if (ctx.channel().id() != null && SimpleChannelPoolHandler.CHANNEL_HANDLER_POOL.containsKey(ctx.channel().id())) {
+            SimpleChannelPoolHandler.CHANNEL_HANDLER_POOL.remove(ctx.channel().id());
         }
         ctx.close();
     }
