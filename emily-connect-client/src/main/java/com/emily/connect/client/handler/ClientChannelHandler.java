@@ -7,6 +7,8 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import static com.emily.connect.client.handler.PoolClientChannelHandler.POOL_CHANNEL_HANDLER;
+
 /**
  * @program: SkyDb
  * @description: 由于需要在 handler 中发送消息给服务端，并且将服务端返回的消息读取后返回给消费者,所以实现了 Callable 接口，这样可以运行有返回值的线程
@@ -22,7 +24,7 @@ public class ClientChannelHandler extends SimpleChannelInboundHandler<ResponseEn
     public ResponseEntity result;
 
     public ClientChannelHandler() {
-        System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + " 新建handler------------DbClientChannelHandler");
+        System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + " 新建ClientChannelHandler");
     }
 
     @Override
@@ -43,7 +45,7 @@ public class ClientChannelHandler extends SimpleChannelInboundHandler<ResponseEn
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + cause.getMessage());
         if (ctx.channel().id() != null) {
-            SimpleChannelPoolHandler.CHANNEL_HANDLER_POOL.remove(ctx.channel().id());
+            POOL_CHANNEL_HANDLER.remove(ctx.channel().id());
         }
         ctx.close();
     }

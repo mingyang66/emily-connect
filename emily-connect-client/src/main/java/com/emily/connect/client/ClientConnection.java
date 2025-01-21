@@ -1,7 +1,7 @@
 package com.emily.connect.client;
 
 import com.emily.connect.client.handler.ClientChannelHandler;
-import com.emily.connect.client.handler.SimpleChannelPoolHandler;
+import com.emily.connect.client.handler.PoolClientChannelHandler;
 import com.emily.connect.core.entity.RequestEntity;
 import com.emily.connect.core.entity.RequestHeader;
 import com.emily.connect.core.entity.RequestPayload;
@@ -22,7 +22,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import java.net.InetSocketAddress;
 import java.util.Objects;
 
-import static com.emily.connect.client.handler.SimpleChannelPoolHandler.CHANNEL_HANDLER_POOL;
+import static com.emily.connect.client.handler.PoolClientChannelHandler.POOL_CHANNEL_HANDLER;
 
 /**
  * @program: SkyDb
@@ -82,7 +82,7 @@ public class ClientConnection {
             //如果ChannelPool不存在，则会创建一个新的对象
             @Override
             protected ChannelPool newPool(InetSocketAddress inetSocketAddress) {
-                return new FixedChannelPool(bootstrap.remoteAddress(inetSocketAddress), new SimpleChannelPoolHandler(), properties.getMaxConnections());
+                return new FixedChannelPool(bootstrap.remoteAddress(inetSocketAddress), new PoolClientChannelHandler(), properties.getMaxConnections());
             }
         };
     }
@@ -131,7 +131,7 @@ public class ClientConnection {
                 channel = future.getNow();
                 if (channel != null && channel.isActive() && channel.isWritable()) {
                     //获取信道对应的handler对象
-                    channelHandler = CHANNEL_HANDLER_POOL.get(channel.id());
+                    channelHandler = POOL_CHANNEL_HANDLER.get(channel.id());
                     if (channelHandler != null) {
                         synchronized (channelHandler.object) {
                             //发送TCP请求

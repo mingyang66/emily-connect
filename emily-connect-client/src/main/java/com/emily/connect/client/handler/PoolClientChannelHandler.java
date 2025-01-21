@@ -22,21 +22,21 @@ import java.util.concurrent.TimeUnit;
  * @Author :  Emily
  * @CreateDate :  Created in 2023/3/15 10:31 AM
  */
-public class SimpleChannelPoolHandler extends AbstractChannelPoolHandler {
+public class PoolClientChannelHandler extends AbstractChannelPoolHandler {
     /**
      * 缓存Channel与handler的映射关系
      */
-    public static final Map<ChannelId, ClientChannelHandler> CHANNEL_HANDLER_POOL = PlatformDependent.newConcurrentHashMap();
+    public static final Map<ChannelId, ClientChannelHandler> POOL_CHANNEL_HANDLER = PlatformDependent.newConcurrentHashMap();
 
     @Override
     public void channelAcquired(Channel ch) throws Exception {
         super.channelAcquired(ch);
-        System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + " channelAcquired：" + ch.id());
+        System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + "  Pool channelAcquired：" + ch.id());
     }
 
     @Override
     public void channelReleased(Channel ch) throws Exception {
-        System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + " channelReleased：" + ch.id());
+        System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + " Pool channelReleased：" + ch.id());
         super.channelReleased(ch);
     }
 
@@ -45,9 +45,9 @@ public class SimpleChannelPoolHandler extends AbstractChannelPoolHandler {
      */
     @Override
     public void channelCreated(Channel ch) throws Exception {
-        System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + " channelCreated：" + ch.id());
+        System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + " Pool channelCreated：" + ch.id());
         //缓存当前Channel对应的handler
-        CHANNEL_HANDLER_POOL.putIfAbsent(ch.id(), new ClientChannelHandler());
+        POOL_CHANNEL_HANDLER.putIfAbsent(ch.id(), new ClientChannelHandler());
 
         ChannelPipeline pipeline = ch.pipeline();
         /**
@@ -80,9 +80,9 @@ public class SimpleChannelPoolHandler extends AbstractChannelPoolHandler {
         //自定义编码器
         pipeline.addLast(new MessagePackEncoder());
         //自定义handler处理
-        pipeline.addLast(CHANNEL_HANDLER_POOL.get(ch.id()));
+        pipeline.addLast(POOL_CHANNEL_HANDLER.get(ch.id()));
         //空闲状态处理器，参数说明：读时间空闲时间，0禁用时间|写事件空闲时间，0则禁用|读或写空闲时间，0则禁用
-        pipeline.addLast(new IdleStateHandler(0, 5, 0, TimeUnit.SECONDS));
+        pipeline.addLast(new IdleStateHandler(0, 20, 0, TimeUnit.SECONDS));
         //心跳处理器
         pipeline.addLast(new HeartBeatChannelHandler());
     }
