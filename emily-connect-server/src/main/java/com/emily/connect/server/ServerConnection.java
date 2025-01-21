@@ -5,14 +5,21 @@ import com.emily.connect.server.encoder.ServerMessagePackEncoder;
 import com.emily.connect.server.handler.ServerChannelHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
+import io.netty.channel.group.ChannelGroup;
+import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
+import io.netty.util.concurrent.GlobalEventExecutor;
 
+import java.net.InetSocketAddress;
 import java.nio.ByteOrder;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @program: SkyDb
@@ -21,6 +28,10 @@ import java.time.format.DateTimeFormatter;
  * @create: 2021/09/17
  */
 public class ServerConnection {
+    /**
+     * 创建一个 ChannelGroup 来管理所有活动的 Channel
+     */
+    private static final ChannelGroup CHANNEL_GROUP = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
     /**
      * 用于处理客户端的连接请求
@@ -111,11 +122,21 @@ public class ServerConnection {
                             pipeline.addLast(new ServerMessagePackEncoder());
                             //自定义处理器
                             pipeline.addLast(new ServerChannelHandler());
+                            //将新连接添加到 ChannelGroup
+                            CHANNEL_GROUP.add(ch);
                         }
                     });
             //启动服务器，并绑定端口并且同步
             ChannelFuture channelFuture = serverBootstrap.bind(properties.getPort()).sync();
             System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + " Tcp server start success，port is " + properties.getPort());
+            // 定时任务：每隔 20 秒打印一次客户端数量及信息
+            ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+            scheduler.scheduleAtFixedRate(() -> {
+                for (Channel channel : CHANNEL_GROUP) {
+                    InetSocketAddress remoteAddress = (InetSocketAddress) channel.remoteAddress();
+                    System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + " Connected clients: " + CHANNEL_GROUP.size() + " Client: " + remoteAddress.getAddress().getHostAddress() + ":" + remoteAddress.getPort());
+                }
+            }, 0, 20, TimeUnit.SECONDS);
             //对关闭通道进行监听,监听到通道关闭后，往下执行
             channelFuture.channel().closeFuture().sync();
         } catch (InterruptedException e) {
