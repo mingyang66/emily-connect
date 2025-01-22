@@ -45,10 +45,10 @@ public class ClientConnection {
 
     public ClientConnection(ClientProperties properties) {
         this.properties = properties;
-        this.poolMap = this.newChannelPoolMap(properties);
+        this.poolMap = this.createChannelPoolMap(properties);
     }
 
-    public Bootstrap newBootstrap() {
+    public Bootstrap createBootstrap() {
         return new Bootstrap()
                 //设置线程组
                 .group(workerGroup)
@@ -75,14 +75,13 @@ public class ClientConnection {
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, NumberUtils.toInt(String.valueOf(properties.getConnectTimeOut().toMillis())));
     }
 
-    public AbstractChannelPoolMap<InetSocketAddress, ChannelPool> newChannelPoolMap(ClientProperties properties) {
-        Bootstrap bootstrap = newBootstrap();
+    public AbstractChannelPoolMap<InetSocketAddress, ChannelPool> createChannelPoolMap(ClientProperties properties) {
         //ChannelPool存储、创建、删除管理Map类
         return new AbstractChannelPoolMap<>() {
             //如果ChannelPool不存在，则会创建一个新的对象
             @Override
             protected ChannelPool newPool(InetSocketAddress inetSocketAddress) {
-                return new FixedChannelPool(bootstrap.remoteAddress(inetSocketAddress), new PoolClientChannelHandler(), properties.getMaxConnections());
+                return new FixedChannelPool(createBootstrap().remoteAddress(inetSocketAddress), new PoolClientChannelHandler(), properties.getMaxConnections());
             }
         };
     }
