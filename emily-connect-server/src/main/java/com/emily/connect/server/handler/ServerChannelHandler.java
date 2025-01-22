@@ -64,6 +64,7 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
             }
         } catch (Throwable exception) {
             System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + ":收到消息解析异常" + exception.getMessage());
+            ctx.writeAndFlush(new ResponseEntity().prefix((byte) 0).message("服务异常" + exception.getMessage()));
         } finally {
             //手动释放消息，否则会导致内存泄漏
             ReferenceCountUtil.release(msg);

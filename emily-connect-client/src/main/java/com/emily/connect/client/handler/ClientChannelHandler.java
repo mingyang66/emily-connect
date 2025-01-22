@@ -29,6 +29,28 @@ public class ClientChannelHandler extends SimpleChannelInboundHandler<ResponseEn
         System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + " 新建ClientChannelHandler");
     }
 
+    /**
+     * 当通道变为活动状态时（即连接已建立并且准备好通信），这个方法会被调用
+     * 通常用于发送初始化消息或进行一些连接建立后的设置。
+     */
+    @Override
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + " channelActive：" + ctx.channel().remoteAddress());
+    }
+
+    /**
+     * 当通道变为不活动状态时（即连接已断开），这个方法会被调用。
+     * 通常用于清理资源或进行一些连接关闭后的操作。
+     */
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        POOL_CHANNEL_HANDLER.remove(ctx.channel().id());
+        System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + " channelInactive：" + ctx.channel().remoteAddress());
+    }
+
+    /**
+     * 用于处理每个入站的消息，当有新的消息到达时，这个方法会被调用
+     */
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ResponseEntity response) throws Exception {
         System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + " 接收到响应数据channelRead0：" + response.getMessage());
@@ -40,6 +62,19 @@ public class ClientChannelHandler extends SimpleChannelInboundHandler<ResponseEn
         }
     }
 
+    /**
+     * 当通道读取完成时，这个方法会被调用。
+     * 可以用于触发一些读取完成后的操作。
+     */
+    @Override
+    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
+        System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + " 消息读取完成channelReadComplete：" + ctx.channel().remoteAddress());
+    }
+
+    /**
+     * 当用户事件被触发时，这个方法会被调用。
+     * 可以用于处理用户自定义事件。
+     */
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
         System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + "通道已经超过20秒未与服务端进行读写操作，发送心跳包..." + ctx.channel().remoteAddress());
@@ -62,14 +97,13 @@ public class ClientChannelHandler extends SimpleChannelInboundHandler<ResponseEn
     }
 
     /**
-     * 异常处理
+     * 当处理过程中出现异常时，这个方法会被调用。
+     * 通常用于记录错误日志或关闭连接。
      */
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + cause.getMessage());
-        if (ctx.channel().id() != null) {
-            POOL_CHANNEL_HANDLER.remove(ctx.channel().id());
-        }
+        POOL_CHANNEL_HANDLER.remove(ctx.channel().id());
         ctx.close();
     }
 

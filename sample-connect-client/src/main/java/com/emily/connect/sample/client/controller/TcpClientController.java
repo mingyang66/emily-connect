@@ -53,7 +53,12 @@ public class TcpClientController {
                 .contentType((byte) 0)
                 .action("/api/user/hello")
                 .method("get");
-        ResponseEntity entity = ClientManager.getConnection().getForEntity("test", requestHeader, new RequestPayload("田晓霞"), new RequestPayload("18"), new RequestPayload("2.3"));
+        ResponseEntity entity = ClientManager.getConnection().getForEntity("test", requestHeader,
+                new RequestPayload("田晓霞"),
+                new RequestPayload("18"),
+                new RequestPayload("2.3sd"),
+                new RequestPayload("2.3")
+                );
         return entity.getData();
     }
 }

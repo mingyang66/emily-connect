@@ -32,6 +32,9 @@ public class ByteBufUtils {
     }
 
     public static byte[] readBytesByLen(ByteBuf byteBuf) {
+        if (byteBuf.readableBytes() <= 0) {
+            return new byte[0];
+        }
         int len = byteBuf.readInt();
         byte[] array = new byte[len];
         byteBuf.readBytes(array, 0, len);
@@ -39,6 +42,9 @@ public class ByteBufUtils {
     }
 
     public static byte[] readBytes(ByteBuf byteBuf) {
+        if (byteBuf.readableBytes() <= 0) {
+            return new byte[0];
+        }
         // 获取ByteBuf中可读字节的数量
         int readableBytes = byteBuf.readableBytes();
         // 创建一个字节数组来存储ByteBuf中的数据
