@@ -1,8 +1,10 @@
 package com.emily.connect.client.handler;
 
+import com.emily.connect.core.entity.RequestEntity;
 import com.emily.connect.core.entity.ResponseEntity;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.handler.timeout.IdleStateEvent;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -35,6 +37,27 @@ public class ClientChannelHandler extends SimpleChannelInboundHandler<ResponseEn
                 result = response;
                 this.object.notify();
             }
+        }
+    }
+
+    @Override
+    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+        System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + "通道已经超过20秒未与服务端进行读写操作，发送心跳包..." + ctx.channel().remoteAddress());
+        if (evt instanceof IdleStateEvent e) {
+            switch (e.state()) {
+                case READER_IDLE:
+                case WRITER_IDLE:
+                    RequestEntity entity = new RequestEntity().prefix((byte) 1);
+                    //发送心跳包
+                    ctx.channel().writeAndFlush(entity);
+                    break;
+                case ALL_IDLE:
+                default:
+                    break;
+            }
+        } else {
+            //继续传播事件
+            super.userEventTriggered(ctx, evt);
         }
     }
 

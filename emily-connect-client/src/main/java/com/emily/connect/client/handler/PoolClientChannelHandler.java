@@ -79,11 +79,9 @@ public class PoolClientChannelHandler extends AbstractChannelPoolHandler {
         pipeline.addLast(new LengthFieldPrepender(ByteOrder.BIG_ENDIAN, 2, 0, false));
         //自定义编码器
         pipeline.addLast(new ClientMessagePackEncoder());
+        //空闲状态处理器，参数说明：读时间空闲时间，0禁用时间|写事件空闲时间，0则禁用|读或写空闲时间，0则禁用 控制心跳处理
+        pipeline.addLast(new IdleStateHandler(0, 20, 0, TimeUnit.SECONDS));
         //自定义handler处理
         pipeline.addLast(POOL_CHANNEL_HANDLER.get(ch.id()));
-        //空闲状态处理器，参数说明：读时间空闲时间，0禁用时间|写事件空闲时间，0则禁用|读或写空闲时间，0则禁用
-        pipeline.addLast(new IdleStateHandler(0, 20, 0, TimeUnit.SECONDS));
-        //心跳处理器
-        pipeline.addLast(new HeartBeatChannelHandler());
     }
 }
