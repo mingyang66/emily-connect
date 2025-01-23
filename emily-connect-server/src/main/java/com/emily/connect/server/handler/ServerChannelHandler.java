@@ -50,6 +50,7 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
                         case 1 -> PluginRegistry.getPlugin(PluginType.STRING);
                         default -> null;
                     };
+                    assert plugin != null;
                     Object response = plugin.invoke(entity.getHeaders(), entity.getPayload());
                     //发送调用方法调用结果
                     ctx.writeAndFlush(response);

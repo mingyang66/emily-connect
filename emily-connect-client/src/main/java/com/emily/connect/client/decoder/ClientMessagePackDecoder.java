@@ -9,6 +9,8 @@ import io.netty.handler.codec.ByteToMessageDecoder;
 import java.util.List;
 
 /**
+ * Netty 提供了一些内置的解码器（如 ByteToMessageDecoder），这些解码器会自动管理 ByteBuf 的引用计数。当解码完成后，它们会自动释放 ByteBuf，因此你无需手动释放
+ *
  * @program: emily-connect
  * @description:
  * @author: Emily
