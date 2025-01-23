@@ -31,10 +31,10 @@ import java.util.Objects;
  * @since :  2025/1/15 下午4:24
  */
 @Component
-public class ApplicationJsonPlugin implements Plugin<String> {
+public class RequestJsonPlugin implements Plugin<String> {
     private final RequestMappingHandlerMapping handlerMapping;
 
-    public ApplicationJsonPlugin(RequestMappingHandlerMapping handlerMapping) {
+    public RequestJsonPlugin(RequestMappingHandlerMapping handlerMapping) {
         this.handlerMapping = handlerMapping;
     }
 
@@ -80,7 +80,7 @@ public class ApplicationJsonPlugin implements Plugin<String> {
 
     @Override
     public boolean supports(PluginType pluginType) {
-        return pluginType == PluginType.BEAN;
+        return pluginType == PluginType.JSON;
     }
 
     @Override
@@ -98,9 +98,7 @@ public class ApplicationJsonPlugin implements Plugin<String> {
         ServletRequestAttributes attributes = new ServletRequestAttributes(request, response);
         this.initContextHolders(request, attributes);
         try {
-
             HandlerExecutionChain chain = handlerMapping.getHandler(request);
-
             ResponseEntity entity = new ResponseEntity().prefix((byte) 0);
             if (Objects.isNull(chain)) {
                 return entity.status(10000).message("请求接口不存在");

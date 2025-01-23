@@ -1,6 +1,6 @@
 package com.emily.connect.sample.server.config;
 
-import com.emily.connect.sample.server.plugin.ApplicationJsonPlugin;
+import com.emily.connect.sample.server.plugin.RequestJsonPlugin;
 import com.emily.connect.server.plugin.PluginRegistry;
 import com.emily.connect.server.plugin.PluginType;
 import jakarta.annotation.PostConstruct;
@@ -21,6 +21,6 @@ public class StartUp {
 
     @PostConstruct
     public void init() {
-        PluginRegistry.registerPlugin(PluginType.BEAN, context.getBean(ApplicationJsonPlugin.class));
+        PluginRegistry.registerPlugin(PluginType.JSON, context.getBean(RequestJsonPlugin.class));
     }
 }

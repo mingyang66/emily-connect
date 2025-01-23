@@ -13,6 +13,9 @@ public class RequestHeader {
     private String traceId;
     private String appType;
     private String appVersion;
+    /**
+     * 请求体类型，0-json
+     */
     private byte contentType;
     private String action;
     private String method;
@@ -120,9 +123,9 @@ public class RequestHeader {
         ByteBufUtils.writeString(byteBuf, this.action);
         ByteBufUtils.writeString(byteBuf, this.method);
         // 创建一个字节数组来存储ByteBuf中的数据
-        byte[] byteArray = ByteBufUtils.readBytes(byteBuf);
+        byte[] bytes = ByteBufUtils.readBytes(byteBuf);
         // 释放ByteBuf的资源
         byteBuf.release();
-        return byteArray;
+        return bytes;
     }
 }

@@ -45,12 +45,7 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
                 byte prefix = entity.getPrefix();
                 // 打印ByteBuf中的数据以验证
                 if (prefix == 0) {
-                    Plugin<?> plugin = switch (entity.getHeaders().getContentType()) {
-                        case 0 -> PluginRegistry.getPlugin(PluginType.BEAN);
-                        case 1 -> PluginRegistry.getPlugin(PluginType.STRING);
-                        default -> null;
-                    };
-                    assert plugin != null;
+                    Plugin<?> plugin = PluginRegistry.getPlugin(PluginType.JSON);
                     Object response = plugin.invoke(entity.getHeaders(), entity.getPayload());
                     //发送调用方法调用结果
                     ctx.writeAndFlush(response);
@@ -59,11 +54,9 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
                     ctx.writeAndFlush(new ResponseEntity().prefix((byte) 1));
                 }
             } else {
-                //todo 非可识别数据类型
-                System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + ":不可识别处理数据");
+                ctx.writeAndFlush(new ResponseEntity().prefix((byte) 0).status(10000).message("无有效请求消息"));
             }
         } catch (Throwable exception) {
-            System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + ":收到消息解析异常" + exception.getMessage());
             ctx.writeAndFlush(new ResponseEntity().prefix((byte) 0).status(10000).message("服务异常" + exception.getMessage()));
         } finally {
             //手动释放消息，否则会导致内存泄漏

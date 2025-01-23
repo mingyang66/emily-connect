@@ -19,6 +19,7 @@ public class ClientMessagePackEncoder extends MessageToByteEncoder<RequestEntity
     protected void encode(ChannelHandlerContext ctx, RequestEntity entity, ByteBuf byteBuf) {
         if (entity.getPrefix() == 0) {
             byteBuf.writeByte(entity.getPrefix());
+            //请求头必须存在
             byteBuf.writeBytes(entity.getHeaders().toByteArray());
             RequestPayload[] payload = entity.getPayload();
             if (payload != null) {

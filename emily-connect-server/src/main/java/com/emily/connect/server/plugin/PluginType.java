@@ -5,5 +5,5 @@ package com.emily.connect.server.plugin;
  * @since :  2025/1/15 下午4:56
  */
 public enum PluginType {
-    BEAN, STRING
+    JSON, STRING
 }
