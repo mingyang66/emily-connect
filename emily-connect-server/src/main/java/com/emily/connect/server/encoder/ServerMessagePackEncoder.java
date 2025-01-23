@@ -23,9 +23,9 @@ public class ServerMessagePackEncoder extends MessageToByteEncoder<ResponseEntit
             ByteBufUtils.writeString(byteBuf, entity.getMessage());
             Object data = entity.getData();
             if (data == null) {
-                return;
-            }
-            if (data instanceof byte[] bytes) {
+                byteBuf.writeInt(0);
+            } else if (data instanceof byte[] bytes) {
+                byteBuf.writeInt(bytes.length);
                 byteBuf.writeBytes(bytes);
             } else if (data instanceof String str) {
                 ByteBufUtils.writeString(byteBuf, str);

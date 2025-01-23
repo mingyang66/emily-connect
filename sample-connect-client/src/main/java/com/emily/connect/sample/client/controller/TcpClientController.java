@@ -9,6 +9,7 @@ import com.emily.connect.sample.client.entity.User;
 import com.emily.infrastructure.json.JsonUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
@@ -21,7 +22,7 @@ import java.io.IOException;
 public class TcpClientController {
 
     @GetMapping("api/tcp/client")
-    public Object getObj(User user, HttpServletRequest request) throws IOException {
+    public ResponseEntity getObj(@RequestBody User user, HttpServletRequest request) throws IOException {
         RequestHeader requestHeader = new RequestHeader()
                 .traceId(UUIDUtils.randomSimpleUUID())
                 .appType(request.getHeader("appType"))
@@ -30,8 +31,7 @@ public class TcpClientController {
                 .contentType((byte) 0)
                 .action("/api/user/getUser")
                 .method("POST");
-        ResponseEntity entity = ClientManager.getConnection().getForEntity("test", requestHeader, new RequestPayload(JsonUtils.toJSONString(user)));
-        return entity.getData();
+        return ClientManager.getConnection().getForEntity("test", requestHeader, new RequestPayload(JsonUtils.toJSONString(user)));
     }
 
     @GetMapping("api/tcp/hello")
