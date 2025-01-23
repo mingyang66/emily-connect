@@ -85,19 +85,19 @@ public class ApplicationJsonPlugin implements Plugin<String> {
 
     @Override
     public ResponseEntity invoke(RequestHeader header, RequestPayload... payload) throws Throwable {
-        // 创建模拟请求
+        //创建模拟请求对象
         MockHttpServletRequest request = new MockHttpServletRequest(header.getMethod().toUpperCase(), header.getAction());
         request.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        //request.setContent(payload);
         request.setCharacterEncoding(StandardCharsets.UTF_8.name());
+        //将请求头设置到模拟请求对象
+        Map<String, String> headers = BeanUtils.describe(header);
+        headers.keySet().forEach(k -> request.addHeader(k, headers.get(k)));
+        //创建模拟响应对象
         MockHttpServletResponse response = new MockHttpServletResponse();
-
+        //请求上下文初始化
         ServletRequestAttributes attributes = new ServletRequestAttributes(request, response);
         this.initContextHolders(request, attributes);
         try {
-            //设置请求头
-            Map<String, String> headers = BeanUtils.describe(header);
-            headers.keySet().forEach(k -> request.addHeader(k, headers.get(k)));
 
             HandlerExecutionChain chain = handlerMapping.getHandler(request);
 
@@ -136,7 +136,6 @@ public class ApplicationJsonPlugin implements Plugin<String> {
                     }
 
                 }
-
                 // 调用控制器方法
                 Object result = method.invoke(controller, args);
                 System.out.println("Result: " + result);
@@ -144,6 +143,7 @@ public class ApplicationJsonPlugin implements Plugin<String> {
             }
             return entity.status(10000).message("请求接口不存在");
         } finally {
+            //请求完成，销毁请求上下文对象
             this.resetContextHolders();
             attributes.requestCompleted();
         }
