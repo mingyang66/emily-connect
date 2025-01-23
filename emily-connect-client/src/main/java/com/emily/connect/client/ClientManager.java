@@ -3,7 +3,7 @@ package com.emily.connect.client;
 import java.net.InetSocketAddress;
 
 /**
- * @author :  姚明洋
+ * @author :  Emily
  * @since :  2025/1/21 下午1:41
  */
 public class ClientManager {

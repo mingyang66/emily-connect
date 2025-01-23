@@ -1,7 +1,7 @@
 package com.emily.connect.core.entity;
 
 /**
- * @author :  姚明洋
+ * @author :  Emily
  * @since :  2025/1/20 下午3:01
  */
 public class RequestPayload {

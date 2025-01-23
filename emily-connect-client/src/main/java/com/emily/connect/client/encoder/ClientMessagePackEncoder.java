@@ -8,7 +8,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 
 /**
- * @program: SkyDb
+ * @program: emily-connect
  * @description: Rpc编码器 protobuf[<a href="https://github.com/protocolbuffers/protobuf/releases">...</a>]
  * @author: Emily
  * @create: 2021/09/23

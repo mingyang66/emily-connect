@@ -5,7 +5,7 @@ import java.time.Duration;
 import java.util.Map;
 
 /**
- * @program: SkyDb
+ * @program: emily-connect
  * @description: RPC客户端属性配置类
  * @author: Emily
  * @create: 2021/09/22

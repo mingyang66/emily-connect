@@ -12,7 +12,7 @@ import java.time.format.DateTimeFormatter;
 import static com.emily.connect.client.handler.PoolClientChannelHandler.POOL_CHANNEL_HANDLER;
 
 /**
- * @program: SkyDb
+ * @program: emily-connect
  * @description: 由于需要在 handler 中发送消息给服务端，并且将服务端返回的消息读取后返回给消费者,所以实现了 Callable 接口，这样可以运行有返回值的线程
  * @author: Emily
  * @create: 2021/09/17

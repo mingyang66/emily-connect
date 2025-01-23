@@ -12,7 +12,7 @@ import java.nio.ByteOrder;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author :  姚明洋
+ * @author :  Emily
  * @since :  2025/1/22 下午4:06
  */
 public class ClientChannelInitializer {

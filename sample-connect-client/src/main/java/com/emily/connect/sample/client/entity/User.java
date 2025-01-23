@@ -2,7 +2,7 @@ package com.emily.connect.sample.client.entity;
 
 
 /**
- * @program: SkyDb
+ * @program: emily-connect
  * @description: 自定义RPC传输协议
  * @author: Emily
  * @create: 2021/09/17

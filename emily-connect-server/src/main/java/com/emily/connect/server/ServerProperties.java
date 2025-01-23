@@ -3,7 +3,7 @@ package com.emily.connect.server;
 import java.time.Duration;
 
 /**
- * @program: SkyDb
+ * @program: emily-connect
  * @description: RPC服务端配置
  * @author: Emily
  * @create: 2021/09/22

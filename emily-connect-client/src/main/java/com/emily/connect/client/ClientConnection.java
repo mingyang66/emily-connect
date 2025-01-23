@@ -25,7 +25,7 @@ import java.util.Objects;
 import static com.emily.connect.client.handler.PoolClientChannelHandler.POOL_CHANNEL_HANDLER;
 
 /**
- * @program: SkyDb
+ * @program: emily-connect
  * @description: 创建Netty客户端及自定义处理器
  * @author: Emily
  * @create: 2021/09/17
