@@ -10,15 +10,17 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerExecutionChain;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
@@ -34,34 +36,6 @@ public class ApplicationJsonPlugin implements Plugin<String> {
 
     public ApplicationJsonPlugin(RequestMappingHandlerMapping handlerMapping) {
         this.handlerMapping = handlerMapping;
-    }
-
-    public static boolean isEntityClass(Class<?> clazz) {
-        // 检查类是否包含至少一个字段
-        Field[] fields = clazz.getDeclaredFields();
-        if (fields.length == 0) {
-            return false;
-        }
-
-        // 检查类是否包含至少一个方法
-        Method[] methods = clazz.getDeclaredMethods();
-        if (methods.length == 0) {
-            return false;
-        }
-
-        // 进一步检查方法是否包含 getter 和 setter
-        boolean hasGetter = false;
-        boolean hasSetter = false;
-        for (Method method : methods) {
-            if (method.getName().startsWith("get") && method.getParameterCount() == 0) {
-                hasGetter = true;
-            }
-            if (method.getName().startsWith("set") && method.getParameterCount() == 1) {
-                hasSetter = true;
-            }
-        }
-
-        return hasGetter && hasSetter;
     }
 
     // 检查类型是否是原始类型或包装类型
@@ -117,53 +91,72 @@ public class ApplicationJsonPlugin implements Plugin<String> {
         //request.setContent(payload);
         request.setCharacterEncoding(StandardCharsets.UTF_8.name());
         MockHttpServletResponse response = new MockHttpServletResponse();
-        //设置请求头
-        Map<String, String> headers = BeanUtils.describe(header);
-        headers.keySet().forEach(k -> request.addHeader(k, headers.get(k)));
 
-        HandlerExecutionChain chain = handlerMapping.getHandler(request);
+        ServletRequestAttributes attributes = new ServletRequestAttributes(request, response);
+        this.initContextHolders(request, attributes);
+        try {
+            //设置请求头
+            Map<String, String> headers = BeanUtils.describe(header);
+            headers.keySet().forEach(k -> request.addHeader(k, headers.get(k)));
 
-        ResponseEntity entity = new ResponseEntity().prefix((byte) 0);
-        if (Objects.isNull(chain)) {
-            return entity.status(10000).message("请求接口不存在");
-        }
-        if (chain.getHandler() instanceof HandlerMethod handlerMethod) {
-            // 获取控制器对象 (bean)
-            Object controller = handlerMethod.getBean();
-            System.out.println("Controller bean: " + controller);
-            // 获取方法对象
-            Method method = handlerMethod.getMethod();
-            System.out.println("Method: " + method.getName());
-            // 获取方法参数类型
-            Class<?>[] parameterTypes = method.getParameterTypes();
-            int j = 0;
-            Object[] args = new Object[parameterTypes.length];
-            for (int i = 0; i < parameterTypes.length; i++) {
-                Class<?> parameterType = parameterTypes[i];
-                if (HttpServletRequest.class.isAssignableFrom(parameterType)) {
-                    args[i] = request;
-                } else if (HttpServletResponse.class.isAssignableFrom(parameterType)) {
-                    args[i] = response;
-                } else if (isEntityClass(parameterType)) {
-                    String value = payload[j++].getValue();
-                    args[i] = value == null ? null : JsonUtils.toJavaBean(value, parameterType);
-                } else if (String.class.isAssignableFrom(parameterType)) {
-                    args[i] = payload[j++].getValue();
-                } else if (parameterType.isPrimitive()) {
-                    String value = payload[j++].getValue();
-                    args[i] = toPrimitive(value, parameterType);
-                } else if (isWrapper(parameterType)) {
-                    String value = payload[j++].getValue();
-                    args[i] = value == null ? null : JsonUtils.toJavaBean(value, parameterType);
+            HandlerExecutionChain chain = handlerMapping.getHandler(request);
+
+            ResponseEntity entity = new ResponseEntity().prefix((byte) 0);
+            if (Objects.isNull(chain)) {
+                return entity.status(10000).message("请求接口不存在");
+            }
+            if (chain.getHandler() instanceof HandlerMethod handlerMethod) {
+                // 获取控制器对象 (bean)
+                Object controller = handlerMethod.getBean();
+                System.out.println("Controller bean: " + controller);
+                // 获取方法对象
+                Method method = handlerMethod.getMethod();
+                System.out.println("Method: " + method.getName());
+                // 获取方法参数类型
+                Class<?>[] parameterTypes = method.getParameterTypes();
+                int j = 0;
+                Object[] args = new Object[parameterTypes.length];
+                for (int i = 0; i < parameterTypes.length; i++) {
+                    Class<?> parameterType = parameterTypes[i];
+                    if (HttpServletRequest.class.isAssignableFrom(parameterType)) {
+                        args[i] = request;
+                    } else if (HttpServletResponse.class.isAssignableFrom(parameterType)) {
+                        args[i] = response;
+                    } else if (String.class.isAssignableFrom(parameterType)) {
+                        args[i] = payload[j++].getValue();
+                    } else if (parameterType.isPrimitive()) {
+                        String value = payload[j++].getValue();
+                        args[i] = toPrimitive(value, parameterType);
+                    } else if (isWrapper(parameterType)) {
+                        String value = payload[j++].getValue();
+                        args[i] = value == null ? null : JsonUtils.toJavaBean(value, parameterType);
+                    } else {
+                        String value = payload[j++].getValue();
+                        args[i] = value == null ? null : JsonUtils.toJavaBean(value, parameterType);
+                    }
+
                 }
 
+                // 调用控制器方法
+                Object result = method.invoke(controller, args);
+                System.out.println("Result: " + result);
+                return entity.status(0).message("success").data(result);
             }
-
-            // 调用控制器方法
-            Object result = method.invoke(controller, args);
-            System.out.println("Result: " + result);
-            return entity.status(0).message("success").data(result);
+            return entity.status(10000).message("请求接口不存在");
+        } finally {
+            this.resetContextHolders();
+            attributes.requestCompleted();
         }
-        return entity.status(10000).message("请求接口不存在");
+    }
+
+    private void initContextHolders(HttpServletRequest request, ServletRequestAttributes requestAttributes) {
+        LocaleContextHolder.setLocale(request.getLocale(), false);
+        RequestContextHolder.setRequestAttributes(requestAttributes, false);
+
+    }
+
+    private void resetContextHolders() {
+        LocaleContextHolder.resetLocaleContext();
+        RequestContextHolder.resetRequestAttributes();
     }
 }
