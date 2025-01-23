@@ -104,8 +104,7 @@ public class ApplicationJsonPlugin implements Plugin<String> {
             ResponseEntity entity = new ResponseEntity().prefix((byte) 0);
             if (Objects.isNull(chain)) {
                 return entity.status(10000).message("请求接口不存在");
-            }
-            if (chain.getHandler() instanceof HandlerMethod handlerMethod) {
+            } else if (chain.getHandler() instanceof HandlerMethod handlerMethod) {
                 // 获取控制器对象 (bean)
                 Object controller = handlerMethod.getBean();
                 System.out.println("Controller bean: " + controller);
@@ -140,12 +139,12 @@ public class ApplicationJsonPlugin implements Plugin<String> {
                 Object result = method.invoke(controller, args);
                 System.out.println("Result: " + result);
                 return entity.status(0).message("success").data(result);
+            } else {
+                return entity.status(10000).message("请求接口不存在");
             }
-            return entity.status(10000).message("请求接口不存在");
         } finally {
             //请求完成，销毁请求上下文对象
-            this.resetContextHolders();
-            attributes.requestCompleted();
+            this.resetContextHolders(attributes);
         }
     }
 
@@ -155,8 +154,9 @@ public class ApplicationJsonPlugin implements Plugin<String> {
 
     }
 
-    private void resetContextHolders() {
+    private void resetContextHolders(ServletRequestAttributes requestAttributes) {
         LocaleContextHolder.resetLocaleContext();
         RequestContextHolder.resetRequestAttributes();
+        requestAttributes.requestCompleted();
     }
 }

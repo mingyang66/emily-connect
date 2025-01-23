@@ -38,11 +38,10 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + " Tcp服务器读取到客户端数据channelRead：" + ctx.channel().remoteAddress());
-        if (msg == null) {
-            return;
-        }
         try {
-            if (msg instanceof RequestEntity entity) {
+            if (msg == null) {
+                ctx.writeAndFlush(new ResponseEntity().prefix((byte) 0).status(10000).message("无有效请求消息"));
+            } else if (msg instanceof RequestEntity entity) {
                 byte prefix = entity.getPrefix();
                 // 打印ByteBuf中的数据以验证
                 if (prefix == 0) {
