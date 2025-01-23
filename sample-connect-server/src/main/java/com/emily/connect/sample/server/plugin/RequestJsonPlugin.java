@@ -131,7 +131,6 @@ public class RequestJsonPlugin implements Plugin<String> {
                         String value = payload[j++].getValue();
                         args[i] = value == null ? null : JsonUtils.toJavaBean(value, parameterType);
                     }
-
                 }
                 // 调用控制器方法
                 Object result = method.invoke(controller, args);
