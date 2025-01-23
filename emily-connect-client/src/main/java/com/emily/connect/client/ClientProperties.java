@@ -18,7 +18,7 @@ public class ClientProperties {
     /**
      * 请求超时时间，默认：60秒
      */
-    private Duration readTimeOut = Duration.ofSeconds(60);
+    private Duration readTimeOut = Duration.ofSeconds(10);
     /**
      * 连接超时时间，默认：5秒
      */

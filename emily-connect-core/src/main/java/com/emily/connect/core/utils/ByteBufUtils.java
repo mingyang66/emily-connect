@@ -1,6 +1,7 @@
 package com.emily.connect.core.utils;
 
 import io.netty.buffer.ByteBuf;
+import org.apache.commons.lang3.StringUtils;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -16,8 +17,11 @@ public class ByteBufUtils {
     }
 
     public static String readString(ByteBuf byteBuf, Charset charset) {
-        byte[] b = readBytesByLen(byteBuf);
-        return new String(b, charset);
+        byte[] bytes = readBytesByLen(byteBuf);
+        if (bytes.length == 0) {
+            return null;
+        }
+        return new String(bytes, charset);
     }
 
     /**
@@ -25,10 +29,13 @@ public class ByteBufUtils {
      */
     public static void writeString(ByteBuf byteBuf, String str) {
         Objects.requireNonNull(byteBuf, "byteBuf is null");
-        Objects.requireNonNull(str, "str is null");
-        byte[] bytes = str.getBytes(StandardCharsets.UTF_8);
-        byteBuf.writeInt(bytes.length); // 先写入字符串的长度
-        byteBuf.writeBytes(bytes);
+        if (StringUtils.isBlank(str)) {
+            byteBuf.writeInt(0);
+        } else {
+            byte[] bytes = str.getBytes(StandardCharsets.UTF_8);
+            byteBuf.writeInt(bytes.length); // 先写入字符串的长度
+            byteBuf.writeBytes(bytes);
+        }
     }
 
     public static byte[] readBytesByLen(ByteBuf byteBuf) {
@@ -48,9 +55,9 @@ public class ByteBufUtils {
         // 获取ByteBuf中可读字节的数量
         int readableBytes = byteBuf.readableBytes();
         // 创建一个字节数组来存储ByteBuf中的数据
-        byte[] array = new byte[readableBytes];
+        byte[] bytes = new byte[readableBytes];
         // 将ByteBuf中的数据读到字节数组中
-        byteBuf.readBytes(array);
-        return array;
+        byteBuf.readBytes(bytes);
+        return bytes;
     }
 }

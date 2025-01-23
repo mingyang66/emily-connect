@@ -7,6 +7,7 @@ import com.emily.connect.core.entity.ResponseEntity;
 import com.emily.connect.core.utils.UUIDUtils;
 import com.emily.connect.sample.client.entity.User;
 import com.emily.infrastructure.json.JsonUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,16 +21,11 @@ import java.io.IOException;
 public class TcpClientController {
 
     @GetMapping("api/tcp/client")
-    public Object getObj() throws IOException {
-        User user = new User();
-        user.setUsername("account");
-        user.setPassword("select_test_dual");
-        user.setAge(10);
-
+    public Object getObj(User user, HttpServletRequest request) throws IOException {
         RequestHeader requestHeader = new RequestHeader()
                 .traceId(UUIDUtils.randomSimpleUUID())
-                .appType("com.android")
-                .appVersion("6.8")
+                .appType(request.getHeader("appType"))
+                .appVersion(request.getHeader("appVersion"))
                 .systemNumber("Emily-Sdk")
                 .contentType((byte) 0)
                 .action("/api/user/getUser")
@@ -53,12 +49,11 @@ public class TcpClientController {
                 .contentType((byte) 0)
                 .action("/api/user/hello")
                 .method("get");
-        ResponseEntity entity = ClientManager.getConnection().getForEntity("test", requestHeader,
+        return ClientManager.getConnection().getForEntity("test", requestHeader,
                 new RequestPayload("田晓霞"),
                 new RequestPayload("18"),
                 new RequestPayload("2.3sd"),
                 new RequestPayload("2.3")
-                );
-        return entity.getData();
+        );
     }
 }
