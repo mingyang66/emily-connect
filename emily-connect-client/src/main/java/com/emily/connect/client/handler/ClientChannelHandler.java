@@ -18,6 +18,8 @@ import static com.emily.connect.client.handler.PoolClientChannelHandler.POOL_CHA
  * @create: 2021/09/17
  */
 public class ClientChannelHandler extends SimpleChannelInboundHandler<ResponseEntity> {
+    private static final int MAX_UNRESPONSE_HEARTBEATS = 3;
+    private int unResponseHeartbeats = 0;
     /**
      * 锁对象
      */
@@ -59,6 +61,8 @@ public class ClientChannelHandler extends SimpleChannelInboundHandler<ResponseEn
                 result = response;
                 this.object.notify();
             }
+        } else if (response.getPrefix() == 1) {
+            unResponseHeartbeats = 0;
         }
     }
 
@@ -85,6 +89,12 @@ public class ClientChannelHandler extends SimpleChannelInboundHandler<ResponseEn
                     RequestEntity entity = new RequestEntity().prefix((byte) 1);
                     //发送心跳包
                     ctx.channel().writeAndFlush(entity);
+                    unResponseHeartbeats++;
+                    if (unResponseHeartbeats > MAX_UNRESPONSE_HEARTBEATS) {
+                        System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + " No response for " + MAX_UNRESPONSE_HEARTBEATS + " heartbeats, closing connection.");
+                        POOL_CHANNEL_HANDLER.remove(ctx.channel().id());
+                        ctx.close();
+                    }
                     break;
                 case ALL_IDLE:
                 default:
