@@ -47,6 +47,7 @@ public class ClientChannelHandler extends SimpleChannelInboundHandler<ResponseEn
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         POOL_CHANNEL_HANDLER.remove(ctx.channel().id());
+        ctx.close();
         System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + " channelInactive：" + ctx.channel().remoteAddress());
     }
 
