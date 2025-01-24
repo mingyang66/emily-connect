@@ -28,7 +28,7 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        ctx.channel().close();
+        ctx.close();
         System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + " Tpc服务器连接断开channelInactive：" + ctx.channel().remoteAddress());
     }
 
