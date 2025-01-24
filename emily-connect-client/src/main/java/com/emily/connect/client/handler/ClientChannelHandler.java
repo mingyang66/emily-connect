@@ -1,5 +1,6 @@
 package com.emily.connect.client.handler;
 
+import com.emily.connect.core.constant.MessageType;
 import com.emily.connect.core.entity.RequestEntity;
 import com.emily.connect.core.entity.ResponseEntity;
 import io.netty.channel.ChannelHandlerContext;
@@ -46,9 +47,9 @@ public class ClientChannelHandler extends SimpleChannelInboundHandler<ResponseEn
      */
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + " channelInactive：" + ctx.channel().remoteAddress());
         POOL_CHANNEL_HANDLER.remove(ctx.channel().id());
         ctx.close();
-        System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + " channelInactive：" + ctx.channel().remoteAddress());
     }
 
     /**
@@ -57,12 +58,12 @@ public class ClientChannelHandler extends SimpleChannelInboundHandler<ResponseEn
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ResponseEntity response) throws Exception {
         System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + " 接收到响应数据channelRead0：" + response.getMessage());
-        if (response.getPrefix() == 0) {
+        if (response.getPrefix() == MessageType.REQUEST) {
             synchronized (this.object) {
                 result = response;
                 this.object.notify();
             }
-        } else if (response.getPrefix() == 1) {
+        } else if (response.getPrefix() == MessageType.HEARTBEAT) {
             unResponseHeartbeats = 0;
         }
     }
@@ -87,9 +88,8 @@ public class ClientChannelHandler extends SimpleChannelInboundHandler<ResponseEn
             switch (e.state()) {
                 case READER_IDLE:
                 case WRITER_IDLE:
-                    RequestEntity entity = new RequestEntity().prefix((byte) 1);
                     //发送心跳包
-                    ctx.channel().writeAndFlush(entity);
+                    ctx.channel().writeAndFlush(new RequestEntity().prefix(MessageType.HEARTBEAT));
                     unResponseHeartbeats++;
                     if (unResponseHeartbeats > MAX_UNRESPONSE_HEARTBEATS) {
                         System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + " No response for " + MAX_UNRESPONSE_HEARTBEATS + " heartbeats, closing connection.");

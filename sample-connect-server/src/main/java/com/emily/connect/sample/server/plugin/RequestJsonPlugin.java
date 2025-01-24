@@ -1,5 +1,6 @@
 package com.emily.connect.sample.server.plugin;
 
+import com.emily.connect.core.constant.MessageType;
 import com.emily.connect.core.entity.RequestHeader;
 import com.emily.connect.core.entity.RequestPayload;
 import com.emily.connect.core.entity.ResponseEntity;
@@ -99,7 +100,7 @@ public class RequestJsonPlugin implements Plugin<String> {
         this.initContextHolders(request, attributes);
         try {
             HandlerExecutionChain chain = handlerMapping.getHandler(request);
-            ResponseEntity entity = new ResponseEntity().prefix((byte) 0);
+            ResponseEntity entity = new ResponseEntity().prefix(MessageType.REQUEST);
             if (Objects.isNull(chain)) {
                 return entity.status(10000).message("请求接口不存在");
             } else if (chain.getHandler() instanceof HandlerMethod handlerMethod) {
