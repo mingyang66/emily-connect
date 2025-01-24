@@ -43,14 +43,13 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
             if (msg == null) {
                 ctx.writeAndFlush(new ResponseEntity().prefix(MessageType.REQUEST).status(10000).message("无有效请求消息"));
             } else if (msg instanceof RequestEntity entity) {
-                byte prefix = entity.getPrefix();
                 // 打印ByteBuf中的数据以验证
-                if (prefix == 0) {
+                if (entity.getPrefix() == MessageType.REQUEST) {
                     Plugin<?> plugin = PluginRegistry.getPlugin(PluginType.JSON);
                     Object response = plugin.invoke(entity.getHeaders(), entity.getPayload());
                     //发送调用方法调用结果
                     ctx.writeAndFlush(response);
-                } else if (prefix == 1) {
+                } else if (entity.getPrefix() == MessageType.HEARTBEAT) {
                     System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + ":收到 " + ctx.channel().remoteAddress() + " 心跳包");
                     ctx.writeAndFlush(new ResponseEntity().prefix(MessageType.HEARTBEAT));
                 }

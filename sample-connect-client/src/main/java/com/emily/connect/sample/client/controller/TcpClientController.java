@@ -29,7 +29,7 @@ public class TcpClientController {
                 .appVersion(request.getHeader("appVersion"))
                 .systemNumber("Emily-Sdk")
                 .contentType((byte) 0)
-                .action("/api/user/getUser")
+                .url("/api/user/getUser")
                 .method("POST");
         return ClientManager.getConnection().getForEntity("test", requestHeader, new RequestPayload(JsonUtils.toJSONString(user)));
     }
@@ -47,7 +47,7 @@ public class TcpClientController {
                 .appVersion("6.8")
                 .systemNumber("Emily-Sdk")
                 .contentType((byte) 0)
-                .action("/api/user/hello")
+                .url("/api/user/hello")
                 .method("get");
         return ClientManager.getConnection().getForEntity("test", requestHeader,
                 new RequestPayload("田晓霞"),

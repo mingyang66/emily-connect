@@ -21,6 +21,7 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerExecutionChain;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
@@ -47,17 +48,11 @@ public class RequestJsonPlugin implements Plugin<String> {
     @Override
     public ResponseEntity invoke(RequestHeader header, RequestPayload... payload) throws Throwable {
         //创建模拟请求对象
-        MockHttpServletRequest request = new MockHttpServletRequest(header.getMethod().toUpperCase(), header.getAction());
-        request.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        request.setCharacterEncoding(StandardCharsets.UTF_8.name());
-        //将请求头设置到模拟请求对象
-        Map<String, String> headers = BeanUtils.describe(header);
-        headers.keySet().forEach(k -> request.addHeader(k, headers.get(k)));
+        HttpServletRequest request = this.initHttpServletRequest(header);
         //创建模拟响应对象
         MockHttpServletResponse response = new MockHttpServletResponse();
         //请求上下文初始化
-        ServletRequestAttributes attributes = new ServletRequestAttributes(request, response);
-        this.initContextHolders(request, attributes);
+        ServletRequestAttributes attributes = this.initContextHolders(request, response);
         try {
             HandlerExecutionChain chain = handlerMapping.getHandler(request);
             ResponseEntity entity = new ResponseEntity().prefix(MessageType.REQUEST);
@@ -66,10 +61,8 @@ public class RequestJsonPlugin implements Plugin<String> {
             } else if (chain.getHandler() instanceof HandlerMethod handlerMethod) {
                 // 获取控制器对象 (bean)
                 Object controller = handlerMethod.getBean();
-                System.out.println("Controller bean: " + controller);
                 // 获取方法对象
                 Method method = handlerMethod.getMethod();
-                System.out.println("Method: " + method.getName());
                 // 获取方法参数类型
                 Class<?>[] parameterTypes = method.getParameterTypes();
                 int j = 0;
@@ -87,10 +80,7 @@ public class RequestJsonPlugin implements Plugin<String> {
                         args[i] = value == null ? null : JsonUtils.toJavaBean(value, parameterType);
                     }
                 }
-                // 调用控制器方法
-                Object result = method.invoke(controller, args);
-                System.out.println("Result: " + result);
-                return entity.status(0).message("success").data(result);
+                return entity.status(0).message("success").data(method.invoke(controller, args));
             } else {
                 return entity.status(10000).message("请求接口不存在");
             }
@@ -100,10 +90,22 @@ public class RequestJsonPlugin implements Plugin<String> {
         }
     }
 
-    private void initContextHolders(HttpServletRequest request, ServletRequestAttributes requestAttributes) {
-        LocaleContextHolder.setLocale(request.getLocale(), false);
-        RequestContextHolder.setRequestAttributes(requestAttributes, false);
+    private HttpServletRequest initHttpServletRequest(RequestHeader header) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        //创建模拟请求对象
+        MockHttpServletRequest request = new MockHttpServletRequest(header.getMethod().toUpperCase(), header.getUrl());
+        request.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        request.setCharacterEncoding(StandardCharsets.UTF_8.name());
+        //将请求头设置到模拟请求对象
+        Map<String, String> headers = BeanUtils.describe(header);
+        headers.keySet().forEach(k -> request.addHeader(k, headers.get(k)));
+        return request;
+    }
 
+    private ServletRequestAttributes initContextHolders(HttpServletRequest request, HttpServletResponse response) {
+        ServletRequestAttributes attributes = new ServletRequestAttributes(request, response);
+        LocaleContextHolder.setLocale(request.getLocale(), false);
+        RequestContextHolder.setRequestAttributes(attributes, false);
+        return attributes;
     }
 
     private void resetContextHolders(ServletRequestAttributes requestAttributes) {

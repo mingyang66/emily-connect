@@ -17,8 +17,12 @@ public class RequestHeader {
      * 请求体类型，0-json
      */
     private byte contentType;
-    private String action;
+    private String url;
     private String method;
+    /**
+     * 请求超时时间，单位：秒
+     */
+    private int timeout;
 
     public String getTraceId() {
         return traceId;
@@ -60,12 +64,12 @@ public class RequestHeader {
         this.method = method;
     }
 
-    public String getAction() {
-        return action;
+    public String getUrl() {
+        return url;
     }
 
-    public void setAction(String action) {
-        this.action = action;
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public byte getContentType() {
@@ -74,6 +78,14 @@ public class RequestHeader {
 
     public void setContentType(byte contentType) {
         this.contentType = contentType;
+    }
+
+    public int getTimeout() {
+        return timeout;
+    }
+
+    public void setTimeout(int timeout) {
+        this.timeout = timeout;
     }
 
     public RequestHeader traceId(String traceId) {
@@ -101,13 +113,18 @@ public class RequestHeader {
         return this;
     }
 
-    public RequestHeader action(String action) {
-        this.action = action;
+    public RequestHeader url(String url) {
+        this.url = url;
         return this;
     }
 
     public RequestHeader method(String method) {
         this.method = method;
+        return this;
+    }
+
+    public RequestHeader timeout(int timeout) {
+        this.timeout = timeout;
         return this;
     }
 
@@ -120,8 +137,9 @@ public class RequestHeader {
         ByteBufUtils.writeString(byteBuf, this.appType);
         ByteBufUtils.writeString(byteBuf, this.appVersion);
         byteBuf.writeByte(this.contentType);
-        ByteBufUtils.writeString(byteBuf, this.action);
+        ByteBufUtils.writeString(byteBuf, this.url);
         ByteBufUtils.writeString(byteBuf, this.method);
+        byteBuf.writeInt(this.timeout);
         // 创建一个字节数组来存储ByteBuf中的数据
         byte[] bytes = ByteBufUtils.readBytes(byteBuf);
         // 释放ByteBuf的资源

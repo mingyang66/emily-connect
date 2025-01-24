@@ -33,8 +33,9 @@ public class ServerMessagePackDecoder extends ByteToMessageDecoder {
                     .appType(ByteBufUtils.readString(byteBuf))
                     .appVersion(ByteBufUtils.readString(byteBuf))
                     .contentType(byteBuf.readByte())
-                    .action(ByteBufUtils.readString(byteBuf))
-                    .method(ByteBufUtils.readString(byteBuf)));
+                    .url(ByteBufUtils.readString(byteBuf))
+                    .method(ByteBufUtils.readString(byteBuf))
+                    .timeout(byteBuf.readInt()));
             int count = byteBuf.readInt();
             if (count > 0) {
                 List<RequestPayload> payload = new ArrayList<>();
