@@ -47,10 +47,8 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
                 if (entity.getPrefix() == MessageType.REQUEST) {
                     Plugin<?> plugin = PluginRegistry.getPlugin(PluginType.JSON);
                     Object response = plugin.invoke(entity.getHeaders(), entity.getPayload());
-                    //发送调用方法调用结果
                     ctx.writeAndFlush(response);
                 } else if (entity.getPrefix() == MessageType.HEARTBEAT) {
-                    System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + ":收到 " + ctx.channel().remoteAddress() + " 心跳包");
                     ctx.writeAndFlush(new ResponseEntity().prefix(MessageType.HEARTBEAT));
                 }
             } else {
