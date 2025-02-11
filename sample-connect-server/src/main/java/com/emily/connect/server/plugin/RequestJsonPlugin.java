@@ -5,6 +5,7 @@ import com.emily.connect.core.entity.RequestHeader;
 import com.emily.connect.core.entity.RequestPayload;
 import com.emily.connect.core.entity.ResponseEntity;
 import com.emily.infrastructure.json.JsonUtils;
+import com.emily.infrastructure.web.exception.entity.BusinessException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.ConstraintViolation;
@@ -81,8 +82,8 @@ public class RequestJsonPlugin implements Plugin<String> {
                         args[i] = value == null ? null : JsonUtils.toJavaBean(value, parameterType);
                     }
                 }
-                // 参数校验
-                if(args.length > 0) {
+                //参数校验 todo
+                if (args.length > 0) {
                     Set<ConstraintViolation<Object>> validates = validator.validate(args[0]);
                     if (!validates.isEmpty()) {
                         // 处理验证错误
@@ -93,9 +94,10 @@ public class RequestJsonPlugin implements Plugin<String> {
                                     .append(violation.getMessage())
                                     .append("; ");
                         }
-                        return entity.status(0).message(errorMessage.toString());
+                        throw new BusinessException(10000, errorMessage.toString());
                     }
                 }
+                //调用接口
                 return entity.status(0).message("success").data(method.invoke(controller, args));
             } else {
                 return entity.status(10000).message("请求接口不存在");

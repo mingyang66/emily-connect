@@ -55,7 +55,8 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
                 ctx.writeAndFlush(new ResponseEntity().prefix(MessageType.REQUEST).status(10000).message("无有效请求消息"));
             }
         } catch (Throwable exception) {
-            ctx.writeAndFlush(new ResponseEntity().prefix(MessageType.REQUEST).status(10000).message("服务异常" + exception.getMessage()));
+            //全局异常处理 todo
+            ctx.writeAndFlush(new ResponseEntity().prefix(MessageType.REQUEST).status(10000).message(exception.getMessage()));
         } finally {
             //手动释放消息，否则会导致内存泄漏
             ReferenceCountUtil.release(msg);
