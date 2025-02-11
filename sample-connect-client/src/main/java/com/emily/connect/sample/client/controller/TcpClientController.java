@@ -8,6 +8,7 @@ import com.emily.connect.core.utils.UUIDUtils;
 import com.emily.connect.sample.client.entity.User;
 import com.emily.infrastructure.json.JsonUtils;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -55,5 +56,9 @@ public class TcpClientController {
                 new RequestPayload("2.3sd"),
                 new RequestPayload("2.3")
         );
+    }
+    @GetMapping(value = "api/response/getNull",produces = MediaType.TEXT_PLAIN_VALUE)
+    public String getNull(){
+        return null;
     }
 }

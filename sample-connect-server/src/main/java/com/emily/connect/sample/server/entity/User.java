@@ -1,5 +1,7 @@
 package com.emily.connect.sample.server.entity;
 
+import jakarta.validation.constraints.NotEmpty;
+
 /**
  * @author :  Emily
  * @since :  2025/1/16 上午9:36
@@ -8,6 +10,7 @@ public class User {
     /**
      * sql语句唯一标识
      */
+    @NotEmpty(message = "用户名不可为空")
     private String username;
     /**
      * 数据库标识

@@ -1,20 +1,19 @@
-package com.emily.connect.sample.server.plugin;
+package com.emily.connect.server.plugin;
 
 import com.emily.connect.core.constant.MessageType;
 import com.emily.connect.core.entity.RequestHeader;
 import com.emily.connect.core.entity.RequestPayload;
 import com.emily.connect.core.entity.ResponseEntity;
-import com.emily.connect.server.plugin.Plugin;
-import com.emily.connect.server.plugin.PluginType;
 import com.emily.infrastructure.json.JsonUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
 import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.method.HandlerMethod;
@@ -26,17 +25,19 @@ import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * @author :  Emily
  * @since :  2025/1/15 下午4:24
  */
-@Component
 public class RequestJsonPlugin implements Plugin<String> {
     private final RequestMappingHandlerMapping handlerMapping;
+    private final Validator validator;
 
-    public RequestJsonPlugin(RequestMappingHandlerMapping handlerMapping) {
+    public RequestJsonPlugin(RequestMappingHandlerMapping handlerMapping, Validator validator) {
         this.handlerMapping = handlerMapping;
+        this.validator = validator;
     }
 
 
@@ -80,6 +81,21 @@ public class RequestJsonPlugin implements Plugin<String> {
                         args[i] = value == null ? null : JsonUtils.toJavaBean(value, parameterType);
                     }
                 }
+                // 参数校验
+                if(args.length > 0) {
+                    Set<ConstraintViolation<Object>> validates = validator.validate(args[0]);
+                    if (!validates.isEmpty()) {
+                        // 处理验证错误
+                        StringBuilder errorMessage = new StringBuilder("Validation failed for Parameter: ");
+                        for (ConstraintViolation<Object> violation : validates) {
+                            errorMessage.append(violation.getPropertyPath())
+                                    .append(" ")
+                                    .append(violation.getMessage())
+                                    .append("; ");
+                        }
+                        return entity.status(0).message(errorMessage.toString());
+                    }
+                }
                 return entity.status(0).message("success").data(method.invoke(controller, args));
             } else {
                 return entity.status(10000).message("请求接口不存在");
@@ -90,6 +106,7 @@ public class RequestJsonPlugin implements Plugin<String> {
         }
     }
 
+
     private HttpServletRequest initHttpServletRequest(RequestHeader header) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         //创建模拟请求对象
         MockHttpServletRequest request = new MockHttpServletRequest(header.getMethod().toUpperCase(), header.getUrl());
@@ -97,7 +114,7 @@ public class RequestJsonPlugin implements Plugin<String> {
         request.setCharacterEncoding(StandardCharsets.UTF_8.name());
         //将请求头设置到模拟请求对象
         Map<String, String> headers = BeanUtils.describe(header);
-        headers.keySet().forEach(k -> request.addHeader(k, headers.get(k)));
+        headers.keySet().forEach(k -> request.addHeader(k, headers.get(k) == null ? "" : headers.get(k)));
         return request;
     }
 

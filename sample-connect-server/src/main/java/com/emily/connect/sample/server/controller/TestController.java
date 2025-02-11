@@ -1,7 +1,7 @@
 package com.emily.connect.sample.server.controller;
 
 import com.emily.connect.sample.server.entity.User;
-import com.emily.connect.sample.server.utils.RequestUtils;
+import com.otter.infrastructure.servlet.RequestUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.validation.annotation.Validated;
