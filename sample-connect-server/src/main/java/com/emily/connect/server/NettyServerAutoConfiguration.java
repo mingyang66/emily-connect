@@ -3,6 +3,7 @@ package com.emily.connect.server;
 import com.emily.connect.server.plugin.PluginRegistry;
 import com.emily.connect.server.plugin.PluginType;
 import com.emily.connect.server.plugin.ServletRequestPlugin;
+import com.emily.connect.server.plugin.TcpRequestPlugin;
 import jakarta.validation.Validator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,13 @@ public class NettyServerAutoConfiguration implements InitializingBean, Disposabl
         ServletRequestPlugin servletRequestPlugin = new ServletRequestPlugin(handlerMapping, validator);
         PluginRegistry.registerPlugin(PluginType.SERVLET, servletRequestPlugin);
         return servletRequestPlugin;
+    }
+
+    @Bean
+    public TcpRequestPlugin tcpRequestPlugin(RequestMappingHandlerMapping handlerMapping, Validator validator) {
+        TcpRequestPlugin tcpRequestPlugin = new TcpRequestPlugin(handlerMapping, validator);
+        PluginRegistry.registerPlugin(PluginType.TCP, tcpRequestPlugin);
+        return tcpRequestPlugin;
     }
 
     @Override
