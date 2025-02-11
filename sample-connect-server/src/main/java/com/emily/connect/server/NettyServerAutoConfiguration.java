@@ -2,7 +2,7 @@ package com.emily.connect.server;
 
 import com.emily.connect.server.plugin.PluginRegistry;
 import com.emily.connect.server.plugin.PluginType;
-import com.emily.connect.server.plugin.RequestJsonPlugin;
+import com.emily.connect.server.plugin.TcpServletRequestPlugin;
 import jakarta.validation.Validator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,7 +10,6 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 /**
@@ -22,8 +21,8 @@ public class NettyServerAutoConfiguration implements InitializingBean, Disposabl
     private static final Logger LOG = LoggerFactory.getLogger(NettyServerAutoConfiguration.class);
 
     @Bean
-    public RequestJsonPlugin requestJsonPlugin(RequestMappingHandlerMapping handlerMapping, Validator validator) {
-        RequestJsonPlugin requestJsonPlugin = new RequestJsonPlugin(handlerMapping, validator);
+    public TcpServletRequestPlugin requestJsonPlugin(RequestMappingHandlerMapping handlerMapping, Validator validator) {
+        TcpServletRequestPlugin requestJsonPlugin = new TcpServletRequestPlugin(handlerMapping, validator);
         PluginRegistry.registerPlugin(PluginType.JSON, requestJsonPlugin);
         return requestJsonPlugin;
     }
