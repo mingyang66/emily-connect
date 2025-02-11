@@ -45,7 +45,7 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
             } else if (msg instanceof RequestEntity entity) {
                 // 打印ByteBuf中的数据以验证
                 if (entity.getPrefix() == MessageType.REQUEST) {
-                    Plugin<?> plugin = PluginRegistry.getPlugin(PluginType.JSON);
+                    Plugin<?> plugin = PluginRegistry.getPlugin(PluginType.SERVLET);
                     Object response = plugin.invoke(entity.getHeaders(), entity.getPayload());
                     ctx.writeAndFlush(response);
                 } else if (entity.getPrefix() == MessageType.HEARTBEAT) {

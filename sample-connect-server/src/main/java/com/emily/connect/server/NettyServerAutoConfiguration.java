@@ -2,7 +2,7 @@ package com.emily.connect.server;
 
 import com.emily.connect.server.plugin.PluginRegistry;
 import com.emily.connect.server.plugin.PluginType;
-import com.emily.connect.server.plugin.TcpServletRequestPlugin;
+import com.emily.connect.server.plugin.ServletRequestPlugin;
 import jakarta.validation.Validator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,10 +21,10 @@ public class NettyServerAutoConfiguration implements InitializingBean, Disposabl
     private static final Logger LOG = LoggerFactory.getLogger(NettyServerAutoConfiguration.class);
 
     @Bean
-    public TcpServletRequestPlugin requestJsonPlugin(RequestMappingHandlerMapping handlerMapping, Validator validator) {
-        TcpServletRequestPlugin requestJsonPlugin = new TcpServletRequestPlugin(handlerMapping, validator);
-        PluginRegistry.registerPlugin(PluginType.JSON, requestJsonPlugin);
-        return requestJsonPlugin;
+    public ServletRequestPlugin servletRequestPlugin(RequestMappingHandlerMapping handlerMapping, Validator validator) {
+        ServletRequestPlugin servletRequestPlugin = new ServletRequestPlugin(handlerMapping, validator);
+        PluginRegistry.registerPlugin(PluginType.SERVLET, servletRequestPlugin);
+        return servletRequestPlugin;
     }
 
     @Override

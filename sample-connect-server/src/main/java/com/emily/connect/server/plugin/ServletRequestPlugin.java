@@ -32,11 +32,11 @@ import java.util.Set;
  * @author :  Emily
  * @since :  2025/1/15 下午4:24
  */
-public class TcpServletRequestPlugin implements Plugin<String> {
+public class ServletRequestPlugin implements Plugin<String> {
     private final RequestMappingHandlerMapping handlerMapping;
     private final Validator validator;
 
-    public TcpServletRequestPlugin(RequestMappingHandlerMapping handlerMapping, Validator validator) {
+    public ServletRequestPlugin(RequestMappingHandlerMapping handlerMapping, Validator validator) {
         this.handlerMapping = handlerMapping;
         this.validator = validator;
     }
@@ -44,7 +44,7 @@ public class TcpServletRequestPlugin implements Plugin<String> {
 
     @Override
     public boolean supports(PluginType pluginType) {
-        return pluginType == PluginType.JSON;
+        return pluginType == PluginType.SERVLET;
     }
 
     @Override
