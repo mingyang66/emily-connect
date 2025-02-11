@@ -1,6 +1,6 @@
 package com.emily.connect.server.plugin;
 
-import com.emily.connect.core.constant.MessageType;
+import com.emily.connect.core.constant.PrefixType;
 import com.emily.connect.core.entity.RequestHeader;
 import com.emily.connect.core.entity.RequestPayload;
 import com.emily.connect.core.entity.ResponseEntity;
@@ -67,7 +67,7 @@ public class TcpRequestPlugin implements Plugin<String> {
                 // 参数校验
                 validateParameter(args);
                 // 调用接口
-                return new ResponseEntity().prefix(MessageType.REQUEST).status(0).message("success").data(method.invoke(controller, args));
+                return new ResponseEntity().prefix(PrefixType.TCP).status(0).message("success").data(method.invoke(controller, args));
             } else {
                 throw new BusinessException(10000, "请求接口不存在");
             }

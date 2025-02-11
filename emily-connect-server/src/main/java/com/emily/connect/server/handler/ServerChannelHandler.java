@@ -1,6 +1,6 @@
 package com.emily.connect.server.handler;
 
-import com.emily.connect.core.constant.MessageType;
+import com.emily.connect.core.constant.PrefixType;
 import com.emily.connect.core.entity.RequestEntity;
 import com.emily.connect.core.entity.ResponseEntity;
 import com.emily.connect.server.plugin.Plugin;
@@ -39,24 +39,26 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + " Tcp服务器读取到客户端数据channelRead：" + ctx.channel().remoteAddress());
+        byte prefix = PrefixType.TCP;
         try {
             if (msg == null) {
-                ctx.writeAndFlush(new ResponseEntity().prefix(MessageType.REQUEST).status(10000).message("无有效请求消息"));
+                ctx.writeAndFlush(new ResponseEntity().prefix(prefix).status(10000).message("无有效请求消息"));
             } else if (msg instanceof RequestEntity entity) {
+                prefix = entity.getPrefix();
                 // 打印ByteBuf中的数据以验证
-                if (entity.getPrefix() == MessageType.REQUEST) {
-                    Plugin<?> plugin = PluginRegistry.getPlugin(PluginType.SERVLET);
+                if (prefix == PrefixType.HEARTBEAT) {
+                    ctx.writeAndFlush(new ResponseEntity().prefix(PrefixType.HEARTBEAT));
+                } else {
+                    Plugin<?> plugin = PluginRegistry.getPlugin(PluginType.getPluginTypeByCode(prefix));
                     Object response = plugin.invoke(entity.getHeaders(), entity.getPayload());
                     ctx.writeAndFlush(response);
-                } else if (entity.getPrefix() == MessageType.HEARTBEAT) {
-                    ctx.writeAndFlush(new ResponseEntity().prefix(MessageType.HEARTBEAT));
                 }
             } else {
-                ctx.writeAndFlush(new ResponseEntity().prefix(MessageType.REQUEST).status(10000).message("无有效请求消息"));
+                ctx.writeAndFlush(new ResponseEntity().prefix(prefix).status(10000).message("无有效请求消息"));
             }
         } catch (Throwable exception) {
             //全局异常处理 todo
-            ctx.writeAndFlush(new ResponseEntity().prefix(MessageType.REQUEST).status(10000).message(exception.getMessage()));
+            ctx.writeAndFlush(new ResponseEntity().prefix(prefix).status(10000).message(exception.getMessage()));
         } finally {
             //手动释放消息，否则会导致内存泄漏
             ReferenceCountUtil.release(msg);

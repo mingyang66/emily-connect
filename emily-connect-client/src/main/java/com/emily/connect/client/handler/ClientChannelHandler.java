@@ -1,6 +1,6 @@
 package com.emily.connect.client.handler;
 
-import com.emily.connect.core.constant.MessageType;
+import com.emily.connect.core.constant.PrefixType;
 import com.emily.connect.core.entity.RequestEntity;
 import com.emily.connect.core.entity.ResponseEntity;
 import io.netty.channel.ChannelHandlerContext;
@@ -58,12 +58,12 @@ public class ClientChannelHandler extends SimpleChannelInboundHandler<ResponseEn
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ResponseEntity response) throws Exception {
         System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + " 接收到响应数据channelRead0：" + response.getMessage());
-        if (response.getPrefix() == MessageType.REQUEST) {
+        if (response.getPrefix() == PrefixType.SERVLET || response.getPrefix() == PrefixType.TCP) {
             synchronized (this.object) {
                 result = response;
                 this.object.notify();
             }
-        } else if (response.getPrefix() == MessageType.HEARTBEAT) {
+        } else if (response.getPrefix() == PrefixType.HEARTBEAT) {
             unResponseHeartbeats = 0;
         }
     }
@@ -89,7 +89,7 @@ public class ClientChannelHandler extends SimpleChannelInboundHandler<ResponseEn
                 case READER_IDLE:
                 case WRITER_IDLE:
                     //发送心跳包
-                    ctx.channel().writeAndFlush(new RequestEntity().prefix(MessageType.HEARTBEAT));
+                    ctx.channel().writeAndFlush(new RequestEntity().prefix(PrefixType.HEARTBEAT));
                     unResponseHeartbeats++;
                     if (unResponseHeartbeats > MAX_UNRESPONSE_HEARTBEATS) {
                         System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + " No response for " + MAX_UNRESPONSE_HEARTBEATS + " heartbeats, closing connection.");
