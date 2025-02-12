@@ -15,7 +15,7 @@ public class TcpServerProperties {
     /**
      * 元数据前缀
      */
-    public static final String PREFIX = "spring.emily.netty";
+    public static final String PREFIX = "spring.emily.tcp";
     /**
      * 端口号,默认：9999
      */
@@ -24,6 +24,10 @@ public class TcpServerProperties {
      * 超过多长时间未发生读写就发送一次心跳包，默认：30秒
      */
     private Duration idleTimeOut = Duration.ofSeconds(30);
+    /**
+     * 允许客户端最大未响应心跳次数
+     */
+    private int maxUnResponseHeartbeats = 3;
 
     public int getPort() {
         return port;
@@ -39,5 +43,13 @@ public class TcpServerProperties {
 
     public void setIdleTimeOut(Duration idleTimeOut) {
         this.idleTimeOut = idleTimeOut;
+    }
+
+    public int getMaxUnResponseHeartbeats() {
+        return maxUnResponseHeartbeats;
+    }
+
+    public void setMaxUnResponseHeartbeats(int maxUnResponseHeartbeats) {
+        this.maxUnResponseHeartbeats = maxUnResponseHeartbeats;
     }
 }

@@ -12,12 +12,13 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
+import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.concurrent.GlobalEventExecutor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
 import java.nio.ByteOrder;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -29,6 +30,7 @@ import java.util.concurrent.TimeUnit;
  * @create: 2021/09/17
  */
 public class ServerConnection {
+    private static final Logger LOG = LoggerFactory.getLogger(ServerConnection.class);
     /**
      * 创建一个 ChannelGroup 来管理所有活动的 Channel
      */
@@ -119,31 +121,33 @@ public class ServerConnection {
                              * Length字段的值=真实数据可读字节数+Length字段调整值
                              */
                             pipeline.addLast(new LengthFieldPrepender(ByteOrder.BIG_ENDIAN, 2, 0, false));
+                            //空闲状态处理器，参数说明：读时间空闲时间，0禁用时间|写事件空闲时间，0则禁用|读或写空闲时间，0则禁用 控制心跳处理
+                            pipeline.addLast(new IdleStateHandler(0, 0, properties.getIdleTimeOut().getSeconds(), TimeUnit.SECONDS));
                             //自定义编码器
                             pipeline.addLast(new ServerMessagePackEncoder());
                             //自定义处理器
-                            pipeline.addLast(new ServerChannelHandler());
+                            pipeline.addLast(new ServerChannelHandler(properties));
                             //将新连接添加到 ChannelGroup
                             CHANNEL_GROUP.add(ch);
                         }
                     });
             //启动服务器，并绑定端口并且同步
             ChannelFuture channelFuture = serverBootstrap.bind(properties.getPort()).sync();
-            System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + " Tcp server start success，port is " + properties.getPort());
+            LOG.info("Tcp server started successfully, port is {}", properties.getPort());
             // 定时任务：每隔 20 秒打印一次客户端数量及信息
             ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
             scheduler.scheduleAtFixedRate(() -> {
                 for (Channel channel : CHANNEL_GROUP) {
                     InetSocketAddress remoteAddress = (InetSocketAddress) channel.remoteAddress();
-                    System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + " Connected clients: " + CHANNEL_GROUP.size() + " Client: " + remoteAddress.getAddress().getHostAddress() + ":" + remoteAddress.getPort());
+                    LOG.info("Connected client: {}, Client: {}:{}", CHANNEL_GROUP.size(), remoteAddress.getAddress().getHostAddress(), remoteAddress.getPort());
                 }
             }, 0, 20, TimeUnit.SECONDS);
             //对关闭通道进行监听,监听到通道关闭后，往下执行
             channelFuture.channel().closeFuture().sync();
         } catch (InterruptedException e) {
-            //logger.error("occur exception when start server: {}", PrintExceptionInfo.printErrorInfo(e));
+            LOG.error("occur exception when start server: {}", e.getMessage());
         } finally {
-            System.out.println("shutdown bossGroup and workerGroup");
+            LOG.info("shutdown bossGroup and workerGroup");
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();
         }

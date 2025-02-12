@@ -54,7 +54,7 @@ public class ClientChannelInitializer {
         //自定义编码器
         pipeline.addLast(new ClientMessagePackEncoder());
         //空闲状态处理器，参数说明：读时间空闲时间，0禁用时间|写事件空闲时间，0则禁用|读或写空闲时间，0则禁用 控制心跳处理
-        pipeline.addLast(new IdleStateHandler(0, 20, 0, TimeUnit.SECONDS));
+      //  pipeline.addLast(new IdleStateHandler(0, 20, 0, TimeUnit.SECONDS));
         //自定义handler处理
         pipeline.addLast(channelHandler);
     }
