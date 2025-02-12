@@ -14,10 +14,6 @@ public enum PluginType {
         this.code = code;
     }
 
-    public byte getCode() {
-        return code;
-    }
-
     public static PluginType getPluginTypeByCode(byte code) {
         for (PluginType pluginType : PluginType.values()) {
             if (pluginType.getCode() == code) {
@@ -25,5 +21,9 @@ public enum PluginType {
             }
         }
         throw new IllegalArgumentException("No plugin type found for code " + code);
+    }
+
+    public byte getCode() {
+        return code;
     }
 }

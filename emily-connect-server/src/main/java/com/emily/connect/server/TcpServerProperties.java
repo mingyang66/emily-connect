@@ -1,5 +1,7 @@
 package com.emily.connect.server;
 
+import org.springframework.boot.context.properties.ConfigurationProperties;
+
 import java.time.Duration;
 
 /**
@@ -8,7 +10,12 @@ import java.time.Duration;
  * @author: Emily
  * @create: 2021/09/22
  */
-public class ServerProperties {
+@ConfigurationProperties(prefix = TcpServerProperties.PREFIX)
+public class TcpServerProperties {
+    /**
+     * 元数据前缀
+     */
+    public static final String PREFIX = "spring.emily.netty";
     /**
      * 端口号,默认：9999
      */

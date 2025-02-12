@@ -57,8 +57,9 @@ public class TcpClientController {
                 new RequestPayload("2.3")
         );
     }
-    @GetMapping(value = "api/response/getNull",produces = MediaType.TEXT_PLAIN_VALUE)
-    public String getNull(){
+
+    @GetMapping(value = "api/response/getNull", produces = MediaType.TEXT_PLAIN_VALUE)
+    public String getNull() {
         return null;
     }
 }

@@ -1,5 +1,6 @@
-package com.emily.connect.server;
+package com.emily.connect.server.connection;
 
+import com.emily.connect.server.TcpServerProperties;
 import com.emily.connect.server.decoder.ServerMessagePackDecoder;
 import com.emily.connect.server.encoder.ServerMessagePackEncoder;
 import com.emily.connect.server.handler.ServerChannelHandler;
@@ -44,9 +45,9 @@ public class ServerConnection {
     /**
      * 属性配置
      */
-    private final ServerProperties properties;
+    private final TcpServerProperties properties;
 
-    public ServerConnection(ServerProperties properties) {
+    public ServerConnection(TcpServerProperties properties) {
         this.properties = properties;
     }
 

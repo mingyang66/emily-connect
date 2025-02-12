@@ -20,13 +20,12 @@ import static com.emily.connect.client.handler.PoolClientChannelHandler.POOL_CHA
  */
 public class ClientChannelHandler extends SimpleChannelInboundHandler<ResponseEntity> {
     private static final int MAX_UNRESPONSE_HEARTBEATS = 3;
-    private int unResponseHeartbeats = 0;
     /**
      * 锁对象
      */
     public final Object object = new Object();
-
     public ResponseEntity result;
+    private int unResponseHeartbeats = 0;
 
     public ClientChannelHandler() {
         System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + " 新建ClientChannelHandler");
